@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/solana_spoke.json`.
  */
 export type SolanaSpoke = {
-  "address": "vxGHBayFRtxzCdtEH6vt6P1UihJdfcQ19BvZwdemrqr",
+  "address": "Xaccm6FSksvhANYRnk8yF7hsTfJFzgrXwAbQ18K2ipK",
   "metadata": {
     "name": "solanaSpoke",
     "version": "0.1.0",
@@ -458,7 +458,7 @@ export type SolanaSpoke = {
             },
             {
               "name": "wormholeProgram",
-              "address": "worm2ZoG2kUd4vFXhvjh93UUH596ayRfgQ2MgjNMTth"
+              "address": "3u8hJUVTA4jH1wYAyUur7FFZVQ8H635K3tSHHF4ssjQ5"
             },
             {
               "name": "systemProgram",
@@ -887,7 +887,7 @@ export type SolanaSpoke = {
             },
             {
               "name": "wormholeProgram",
-              "address": "worm2ZoG2kUd4vFXhvjh93UUH596ayRfgQ2MgjNMTth"
+              "address": "3u8hJUVTA4jH1wYAyUur7FFZVQ8H635K3tSHHF4ssjQ5"
             },
             {
               "name": "systemProgram",
@@ -1578,7 +1578,7 @@ export type SolanaSpoke = {
             },
             {
               "name": "wormholeProgram",
-              "address": "worm2ZoG2kUd4vFXhvjh93UUH596ayRfgQ2MgjNMTth"
+              "address": "3u8hJUVTA4jH1wYAyUur7FFZVQ8H635K3tSHHF4ssjQ5"
             },
             {
               "name": "systemProgram",
@@ -2006,7 +2006,7 @@ export type SolanaSpoke = {
         },
         {
           "name": "wormholeProgram",
-          "address": "worm2ZoG2kUd4vFXhvjh93UUH596ayRfgQ2MgjNMTth"
+          "address": "3u8hJUVTA4jH1wYAyUur7FFZVQ8H635K3tSHHF4ssjQ5"
         },
         {
           "name": "rent",
@@ -2426,7 +2426,7 @@ export type SolanaSpoke = {
             },
             {
               "name": "wormholeProgram",
-              "address": "worm2ZoG2kUd4vFXhvjh93UUH596ayRfgQ2MgjNMTth"
+              "address": "3u8hJUVTA4jH1wYAyUur7FFZVQ8H635K3tSHHF4ssjQ5"
             },
             {
               "name": "systemProgram",
@@ -3324,7 +3324,7 @@ export type SolanaSpoke = {
             },
             {
               "name": "wormholeProgram",
-              "address": "worm2ZoG2kUd4vFXhvjh93UUH596ayRfgQ2MgjNMTth"
+              "address": "3u8hJUVTA4jH1wYAyUur7FFZVQ8H635K3tSHHF4ssjQ5"
             },
             {
               "name": "systemProgram",

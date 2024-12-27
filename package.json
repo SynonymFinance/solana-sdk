@@ -7,7 +7,7 @@
     "node": "18.x"
   },
   "scripts": {
-    "start-test": "tsx src/app.ts --flag=testnet",
+    "start-test": "tsx src/app.ts",
     "build": "tsc"
   },
   "dependencies": {

@@ -24,8 +24,9 @@ export class AccountFetcher {
     const baseConfigAccount = await this.spokeProgram.account.baseConfig.fetch(baseConfigPda);
     console.log(">> HubAddress : ", Buffer.from(baseConfigAccount.hubAddress as number[]).toString("hex"));
     console.log(">> HubChainId : ", baseConfigAccount.hubChainId);
-    console.log(">> foreign token bridge address: ", Buffer.from(baseConfigAccount.foreignTokenBridgeAddress).toString("hex"));
-    console.log(">> foreign endpoint: ", baseConfigAccount.tokenBridgeForeignEndpoint.toBase58());
+    console.log(">> Solana Relayer EOA :", baseConfigAccount.relayerAccount.toBase58());
+    console.log(">> Solana Relayer vault :", baseConfigAccount.relayerVault.toBase58());
+    console.log(">> Solana Relayer reward account :", baseConfigAccount.relayerRewardAccount.toBase58());
   }
 
   async fetchHubWormholeTunnelAddress(): Promise<Buffer> {

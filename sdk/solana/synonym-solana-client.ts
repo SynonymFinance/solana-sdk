@@ -74,12 +74,12 @@ export class SynonymSolanaClient {
 
   public async withdraw(
     mint: PublicKey,
-    amount: anchor.BN
+    amount: bigint
   ): Promise<TransactionSignature> {
     const txSignature = await this.outboundTransferTx(
       HubActionType.WithdrawNative,
       mint,
-      amount
+      toBN(amount)
     );
 
     return txSignature;
@@ -87,12 +87,12 @@ export class SynonymSolanaClient {
 
   public async borrow(
     mint: PublicKey,
-    amount: anchor.BN
+    amount: bigint
   ): Promise<TransactionSignature> {
     const txSignature = await this.outboundTransferTx(
       HubActionType.BorrowNative,
       mint,
-      amount
+      toBN(amount)
     );
 
     return txSignature;
@@ -100,12 +100,12 @@ export class SynonymSolanaClient {
 
   public async deposit(
     mint: PublicKey,
-    amount: anchor.BN
+    amount: bigint
   ): Promise<TransactionSignature> {
     const txSignature = await this.inboundTransferTx(
       HubActionType.Deposit,
       mint,
-      amount
+      toBN(amount)
     );
 
     return txSignature;
@@ -113,12 +113,12 @@ export class SynonymSolanaClient {
 
   public async repay(
     mint: PublicKey,
-    amount: anchor.BN
+    amount: bigint
   ): Promise<TransactionSignature> {
     const txSignature = await this.inboundTransferTx(
       HubActionType.Repay,
       mint,
-      amount
+      toBN(amount)
     );
 
     return txSignature;

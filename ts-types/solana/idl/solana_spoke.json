@@ -1,5 +1,5 @@
 {
-  "address": "vxGHBayFRtxzCdtEH6vt6P1UihJdfcQ19BvZwdemrqr",
+  "address": "Xaccm6FSksvhANYRnk8yF7hsTfJFzgrXwAbQ18K2ipK",
   "metadata": {
     "name": "solana_spoke",
     "version": "0.1.0",
@@ -452,7 +452,7 @@
             },
             {
               "name": "wormhole_program",
-              "address": "worm2ZoG2kUd4vFXhvjh93UUH596ayRfgQ2MgjNMTth"
+              "address": "3u8hJUVTA4jH1wYAyUur7FFZVQ8H635K3tSHHF4ssjQ5"
             },
             {
               "name": "system_program",
@@ -881,7 +881,7 @@
             },
             {
               "name": "wormhole_program",
-              "address": "worm2ZoG2kUd4vFXhvjh93UUH596ayRfgQ2MgjNMTth"
+              "address": "3u8hJUVTA4jH1wYAyUur7FFZVQ8H635K3tSHHF4ssjQ5"
             },
             {
               "name": "system_program",
@@ -1572,7 +1572,7 @@
             },
             {
               "name": "wormhole_program",
-              "address": "worm2ZoG2kUd4vFXhvjh93UUH596ayRfgQ2MgjNMTth"
+              "address": "3u8hJUVTA4jH1wYAyUur7FFZVQ8H635K3tSHHF4ssjQ5"
             },
             {
               "name": "system_program",
@@ -2000,7 +2000,7 @@
         },
         {
           "name": "wormhole_program",
-          "address": "worm2ZoG2kUd4vFXhvjh93UUH596ayRfgQ2MgjNMTth"
+          "address": "3u8hJUVTA4jH1wYAyUur7FFZVQ8H635K3tSHHF4ssjQ5"
         },
         {
           "name": "rent",
@@ -2420,7 +2420,7 @@
             },
             {
               "name": "wormhole_program",
-              "address": "worm2ZoG2kUd4vFXhvjh93UUH596ayRfgQ2MgjNMTth"
+              "address": "3u8hJUVTA4jH1wYAyUur7FFZVQ8H635K3tSHHF4ssjQ5"
             },
             {
               "name": "system_program",
@@ -3318,7 +3318,7 @@
             },
             {
               "name": "wormhole_program",
-              "address": "worm2ZoG2kUd4vFXhvjh93UUH596ayRfgQ2MgjNMTth"
+              "address": "3u8hJUVTA4jH1wYAyUur7FFZVQ8H635K3tSHHF4ssjQ5"
             },
             {
               "name": "system_program",
