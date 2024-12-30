@@ -1,0 +1,197 @@
+import { ethers } from "ethers";
+import { Logger } from "winston";
+import { SynonymSolanaClient } from "./synonym-solana-client";
+import { AnchorProvider } from "@coral-xyz/anchor";
+import { GWEI_DECIMALS, WETH_DECIMALS, WSOL_DECIMALS } from "../../src/consts";
+import axios, { AxiosInstance } from "axios";
+import { toBigInt } from "../commons/utils";
+
+
+interface SynoOraclePrices {
+  usdcEth: number;
+  usdcSol: number;
+}
+
+interface SynoPrice {
+  symbol: string;
+  usdValue: number;
+}
+
+interface SynoPriceResponse {
+  prices: SynoPrice[];
+  lastUpdate: string;
+}
+
+export class DeliveryPriceUpdater {
+  private logger: Logger;
+  private solanaClient: SynonymSolanaClient;
+  private axiosInstance: AxiosInstance;
+  private evmRpcProvider: ethers.providers.JsonRpcProvider;
+  // amount of gas need by Hub Transaction on Evm
+  private hubTxGasAmount: number;
+  // We updat price if changes for x %
+  private priceThresholdPercent: bigint;
+  // We update price anyway every 1h (for eg.)
+  private absoluteUpdateIntervalSec: bigint;
+  
+
+  constructor(
+    solanaAnchorProvider: AnchorProvider,
+    evmRpcUrl: string,
+    solanaSpokeAddress: string,
+    hubTxGasAmount: number,
+    synoPriceTrackerUrl: string,
+    priceThresholdPercent: bigint,
+    absoluteUpdateIntervalSec: bigint,
+    logger: Logger,
+  ) {
+    this.logger = logger;
+    this.solanaClient = new SynonymSolanaClient(solanaAnchorProvider, solanaSpokeAddress);
+    this.axiosInstance = axios.create({
+      baseURL: synoPriceTrackerUrl,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    this.evmRpcProvider = new ethers.providers.JsonRpcProvider(evmRpcUrl);
+
+    this.hubTxGasAmount = hubTxGasAmount;
+    this.priceThresholdPercent = priceThresholdPercent;
+    this.absoluteUpdateIntervalSec = absoluteUpdateIntervalSec;
+  }
+
+  public async run(intervalMs: number, timeoutMs: number, retries: number = 3): Promise<void> {
+    while (true) {
+      let success = false;
+      let attempts = 0;
+
+      while (attempts < retries && !success) {
+        try {
+          await this.withTimeout(this.updateDeliveryPrice(), timeoutMs);
+          success = true;
+        } catch (error) {
+          attempts++;
+          if (attempts >= retries) {
+            this.logger.error(`DeliveryPriceUpdater: Failed to update delivery price after ${retries} attempts:`, error);
+          } else {
+            this.logger.warn(`DeliveryPriceUpdater: query attempt ${attempts} failed. Retrying...`);
+          }
+        }
+      }
+
+      if (!success) {
+        this.logger.error(`DeliveryPriceUpdater: All ${retries} retries failed.`);
+      }
+
+      // Wait for the specified interval before the next attempt
+      await new Promise<void>(resolve => setTimeout(resolve, intervalMs));
+    }
+  }
+
+  // Returns current gas price in Wei
+  public async getGasPrice(): Promise<number> {
+    const baseFee = await this.evmRpcProvider.send("eth_gasPrice", []); // returns string in hex notation
+    const baseFeeGwei = Number(baseFee) / Number(GWEI_DECIMALS);
+    return Number(baseFee).valueOf();
+  }
+
+  public async updateDeliveryPrice() {
+    const prices = await this.readPrices();
+    const currentGasPriceInWei = await this.getGasPrice();
+    const hubTxPriceInLamports = this.calculateHubTxCostInLamports(prices, this.hubTxGasAmount, currentGasPriceInWei);
+
+    const lastDeliveryPriceConfig = await this.solanaClient.accountFetcher.fetchDeliveryPriceConfig();
+    const lastPrice = toBigInt(lastDeliveryPriceConfig.hubTxCostSol);
+    const lastUpdateTimestamp = toBigInt(lastDeliveryPriceConfig.lastUpdateTimestamp);
+    const currentTimestamp: bigint = BigInt(Date.now()) / 1000n; // Date.now() retrun milis we need seconds
+    const timeSinceLastUdateSec = currentTimestamp - lastUpdateTimestamp;
+    
+    const isPriceChangeOverTreshold = this.isPriceChangedMoreThanThreshold(hubTxPriceInLamports, lastPrice, this.priceThresholdPercent);
+
+    if(isPriceChangeOverTreshold || timeSinceLastUdateSec > this.absoluteUpdateIntervalSec) {
+      const [txSig, oldPrice] = await this.solanaClient.updateDeliveryPrice(hubTxPriceInLamports);
+      this.logger.info(`DeliveryPriceUpdater: Delivery price upadated, new price: ${hubTxPriceInLamports}, oldPrice: ${oldPrice}, tx sig: ${txSig}`);
+    }
+  }
+
+  public async readPrices(): Promise<SynoOraclePrices> {
+    try {
+      // Perform the GET request to fetch the data
+      const response = await this.axiosInstance.get<SynoPriceResponse>("");
+
+      // Extract the 'prices' field from the response and return as a typed array of `Price`
+      const prices: SynoPrice[] = response.data.prices;
+      const wethPrice = prices.find(price => price.symbol == "WETH");
+      const solPrice = prices.find(price => price.symbol == "SOL");
+
+      if (wethPrice === undefined || solPrice === undefined) {
+        throw Error(`DeliveryPriceUpdater: Fetched price feed does not contain on of => weth: ${wethPrice}, sol: ${solPrice}`);
+      }
+
+      return {
+        usdcEth: wethPrice.usdValue,
+        usdcSol: solPrice.usdValue
+      };
+    } catch (error) {
+      this.logger.error('DeliveryPriceUpdater: Error fetching prices:', error);
+      throw new Error('Failed to fetch prices from the API');
+    }
+  }
+
+  private calculateHubTxCostInLamports(
+    prices: SynoOraclePrices,
+    hubTxGasAmount: number,
+    currentGasPriceInWei: number
+  ): bigint {
+    // Values in `prices` are floating point we are mutlpling them by 1e9 have preserve all decimal positions for computation.
+    // This multplication does not change the computation result as in equation we have solUsdcPriceE9 / ethUsdcPriceE9 (1e9 will get cancelled).
+    const usdcSolPriceE9 = BigInt(Math.trunc(prices.usdcSol * (10 ** 9)));
+    const usdcEthPriceE9 = BigInt(Math.trunc(prices.usdcEth * (10 ** 9)));
+    const hubTxCostWei = BigInt(hubTxGasAmount) * BigInt(currentGasPriceInWei);
+
+    const hubTxCostLamport =
+      (hubTxCostWei * usdcEthPriceE9 * WSOL_DECIMALS) /
+      (usdcSolPriceE9 * WETH_DECIMALS)
+
+
+    return hubTxCostLamport;
+  }
+
+  private withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+      const timer = setTimeout(() => {
+        reject(new Error('DeliveryPriceUpdater: Operation timed out'));
+      }, ms);
+
+      promise.then(
+        (value) => {
+          clearTimeout(timer);
+          resolve(value);
+        },
+        (error) => {
+          clearTimeout(timer);
+          reject(error);
+        }
+      );
+    });
+  }
+  private isPriceChangedMoreThanThreshold(
+    hubTxPriceInLamports: bigint,
+    lastPrice: bigint,
+    priceThresholdPercentage: bigint
+  ): boolean {
+    // Calculate the absolute difference between the two prices
+    const priceDifference: bigint = hubTxPriceInLamports > lastPrice
+      ? hubTxPriceInLamports - lastPrice
+      : lastPrice - hubTxPriceInLamports;
+  
+    // Calculate the threshold value based on percentage
+    const threshold: bigint = (lastPrice * priceThresholdPercentage) / 100n;
+
+    // Check if the price difference exceeds the threshold
+    return priceDifference > threshold;
+  }
+
+}
+
+
