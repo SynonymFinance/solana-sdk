@@ -8,7 +8,8 @@
   },
   "scripts": {
     "start-test": "tsx src/app.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "postinstall": "npm run build"
   },
   "dependencies": {
     "@certusone/wormhole-sdk": "^0.10.10",

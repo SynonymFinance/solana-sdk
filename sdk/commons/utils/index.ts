@@ -6,11 +6,8 @@ import * as anchor from "@coral-xyz/anchor";
 import { BN } from "@coral-xyz/anchor";
 import { PublicKey, LAMPORTS_PER_SOL, Connection, Keypair, SystemProgram, Transaction, sendAndConfirmTransaction, SYSVAR_CLOCK_PUBKEY, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
 import * as wormhole from "@certusone/wormhole-sdk/lib/cjs/solana/wormhole";
-import { deriveBaseConfigPda } from "./pda";
 import { getAccount, getOrCreateAssociatedTokenAccount, TOKEN_PROGRAM_ID, transferChecked } from "@solana/spl-token";
 import { SolanaSpoke } from "../../../ts-types/solana/solana_spoke";
-import { ChainId } from "@certusone/wormhole-sdk";
-import { ProvidersOpts } from "@wormhole-foundation/relayer-engine";
 
 export const WRAPPED_WETH_DECIMALS = 8;
 export const AIRDROP_SOL_AMOUNT = 42 * LAMPORTS_PER_SOL;
@@ -78,8 +75,7 @@ export async function pauseSpoke(program: anchor.Program<SolanaSpoke>, ownerKeyp
   await program.methods
     .pauseSpoke()
     .accounts({
-      owner: ownerKeypair.publicKey,
-      baseConfig: deriveBaseConfigPda(program.programId),
+      owner: ownerKeypair.publicKey
     })
     .signers([ownerKeypair])
     .rpc({ skipPreflight: true });
@@ -89,8 +85,7 @@ export async function unpauseSpoke(program: anchor.Program<SolanaSpoke>, ownerKe
   await program.methods
     .unpauseSpoke()
     .accounts({
-      owner: ownerKeypair.publicKey,
-      baseConfig: deriveBaseConfigPda(program.programId),
+      owner: ownerKeypair.publicKey
     })
     .signers([ownerKeypair])
     .rpc({ skipPreflight: true });
@@ -325,15 +320,4 @@ function wormholePublishMessageAccounts(
 
 export function jsonStringify(object: any): string {
   return JSON.stringify(object, null, 2)
-}
-
-export function extractEvmRpcUrl(hubChainId: ChainId, providers: ProvidersOpts | undefined) : string {
-  if(providers === undefined) {
-    throw Error("Providers not defined");
-  }
-  const evmRpc = providers.chains[hubChainId]?.endpoints[0];
-  if(evmRpc === undefined) {
-    throw Error("Evm rpc endpoint not defined");
-  }
-  return evmRpc;
 }

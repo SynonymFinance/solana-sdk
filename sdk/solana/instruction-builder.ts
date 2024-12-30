@@ -148,7 +148,6 @@ export class InstructionBuilder {
           mint,
           relayerVault: this.relayerVault,
           relayerRewardAccount: this.relayerRewardAccount,
-          wormholeProgram: this.coreBridgePid,
           ...wormholeAccounts
         },
         // @ts-ignore: this account can not be resolved by Anchor and we must declare it
