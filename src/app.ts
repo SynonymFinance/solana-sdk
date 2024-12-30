@@ -11,13 +11,8 @@ import { PublicKey } from "@solana/web3.js";
 // TODO: remove from SDK - move to off-chain relayer and just call client from sdk to updateDeliveryPrice()
 // import { DeliveryPriceUpdater } from "../sdk/solana/delivery-price-updater";
 
-
 async function main() {
   
-  // TODO: how to test sdk? 
-  // - fetch accounts from blockchain
-  // - build and send TX - than wait for error from inside of the handler (?)
-
   const logger = rootLogger("info", "text");
 
   const solanaConnection = createSolanaConnection(SOLANA_RPC);
@@ -45,31 +40,35 @@ async function main() {
   // If we get ZeroDepositAmount it means all Instruction accounts validation was passed and we are in handler body
   await assert.rejects(
     spokeClient.deposit(NATIVE_MINT, 0n),
-    /ZeroDepositAmount/
+    /ZeroInboundTransferAmount/
   );
   console.log("Deposit check - OK");
 
   await assert.rejects(
     spokeClient.repay(NATIVE_MINT, 0n),
-    /ZeroDepositAmount/
+    /ZeroInboundTransferAmount/
   );
   console.log("Repay check - OK");
 
   await assert.rejects(
     spokeClient.withdraw(NATIVE_MINT, 0n),
-    /ZeroWithdrawAmount/
+    /ZeroOutboundTransferAmount/
   );
   console.log("Withdraw check - OK");
 
   await assert.rejects(
     spokeClient.borrow(NATIVE_MINT, 0n),
-    /ZeroWithdrawAmount/
+    /ZeroOutboundTransferAmount/
   );
   console.log("Borrow check - OK");
 
-  // TODO: rename ZeroWithdrawAmount it to ZeroOutboundTransferAmount - do same for inbound
-  // do this similar for account_pairing - ZeroUserAccount
-  // pass on release funds - there we need to pass Vaa hash 
+  await assert.rejects(
+    spokeClient.pairAccount(Buffer.alloc(32, 0)),
+    /ZeroUserAccount/
+  );
+  console.log("Pair account check - OK");
+
+  // There is no simple test like above for releaseFunds() because this instruction needs a has of VAA which is posted on chain
 
 }
 

@@ -3484,8 +3484,8 @@ export type SolanaSpoke = {
     },
     {
       "code": 6007,
-      "name": "zeroDepositAmount",
-      "msg": "Deposit amount is 0"
+      "name": "zeroInboundTransferAmount",
+      "msg": "Inbound transfer amount is 0"
     },
     {
       "code": 6008,
@@ -3691,6 +3691,16 @@ export type SolanaSpoke = {
       "code": 6048,
       "name": "nonceAlreadyConsumed",
       "msg": "Nonce already consumed"
+    },
+    {
+      "code": 6049,
+      "name": "zeroOutboundTransferAmount",
+      "msg": "Outbound transfer amount is 0"
+    },
+    {
+      "code": 6050,
+      "name": "zeroUserAccount",
+      "msg": "User account can not be 0x0"
     }
   ],
   "types": [

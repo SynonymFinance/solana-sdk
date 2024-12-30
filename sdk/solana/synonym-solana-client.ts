@@ -124,7 +124,7 @@ export class SynonymSolanaClient {
     return txSignature;
   }
 
-  public async pairAccounts(
+  public async pairAccount(
     userId: Buffer
   ): Promise<TransactionSignature> {
     const txSignature = await this.pairAccountTx(userId);

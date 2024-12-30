@@ -187,9 +187,7 @@ export class InstructionBuilder {
           // This account is ignored for account pairing (mint) but must be passed
           mint: NATIVE_MINT,
           ...wormholeAccounts
-        },
-        // @ts-ignore: this account can not be resolved by Anchor and we must declare it
-        senderTokenAccount: senderTokenAccount
+        }
       })
       .instruction()
 

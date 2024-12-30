@@ -3478,8 +3478,8 @@
     },
     {
       "code": 6007,
-      "name": "ZeroDepositAmount",
-      "msg": "Deposit amount is 0"
+      "name": "ZeroInboundTransferAmount",
+      "msg": "Inbound transfer amount is 0"
     },
     {
       "code": 6008,
@@ -3685,6 +3685,16 @@
       "code": 6048,
       "name": "NonceAlreadyConsumed",
       "msg": "Nonce already consumed"
+    },
+    {
+      "code": 6049,
+      "name": "ZeroOutboundTransferAmount",
+      "msg": "Outbound transfer amount is 0"
+    },
+    {
+      "code": 6050,
+      "name": "ZeroUserAccount",
+      "msg": "User account can not be 0x0"
     }
   ],
   "types": [
