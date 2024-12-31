@@ -1,7 +1,8 @@
 import * as anchor from "@coral-xyz/anchor";
 import { AnchorProvider, Program } from "@coral-xyz/anchor";
 import { SolanaSpoke } from "../../ts-types/solana/solana_spoke";
-import idl from "../../ts-types/solana/idl/solana_spoke.json";
+// import idl from "../../ts-types/solana/idl/solana_spoke.json";
+import { solanaSpokeIdl } from "../../ts-types";
 import { InstructionBuilder } from "./instruction-builder";
 import { AccountFetcher } from "./account-fetcher";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
@@ -10,6 +11,7 @@ import { AddressLookupTableAccount, ConfirmOptions, PublicKey, Signer, Transacti
 import { buildV0Transaction } from "../commons/utils/lut";
 import { getNetworkFromRpcUrl } from "../../utils";
 import { deriveUserMessageNoncePda, getUserMessageNonceValue, HubActionType, toBN } from "../commons/utils";
+
 
 export enum SolanaNetwork {
   MAINNET = "mainnet",
@@ -43,7 +45,7 @@ export class SynonymSolanaClient {
     this.coreBridgePid = new PublicKey(wormholeContracts.solana.core);
 
     // In Anchor > 0.30 program address is already in IDL and we do not need to pass it separately
-    this.spokeProgram = new Program(idl as SolanaSpoke, anchorProvider);
+    this.spokeProgram = new Program(solanaSpokeIdl as SolanaSpoke, anchorProvider);
     this.instructionBuilder = new InstructionBuilder(
       this.spokeProgram,
       this.relayerVault,
