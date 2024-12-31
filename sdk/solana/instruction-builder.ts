@@ -3,7 +3,7 @@ import { SolanaSpoke } from "../../ts-types/solana/solana_spoke";
 import { Connection, Keypair, PublicKey, TransactionInstruction } from "@solana/web3.js";
 import { derivePostedVaaKey, getPostMessageCpiAccounts } from "@certusone/wormhole-sdk/lib/cjs/solana/wormhole";
 import { getAssociatedTokenAddressSync, NATIVE_MINT } from "@solana/spl-token";
-import { DeliveryInstruction } from "../commons/messaging-helpers/delivery_instruction";
+import { DeliveryInstruction } from "../commons/messaging-helpers/delivery-instruction";
 import { deriveBaseConfigPda, deriveConsumedNoncePda, deriveCustomEmitterPda, deriveUserMessageNoncePda, deriveVaultConfigPda, deriveWormholeCoreMessageKey } from "../commons/utils/pda";
 import { TunnelMessage } from "../commons/messaging-helpers/tunnel-message";
 import { ReleaseFundsPayload } from "../commons/messaging-helpers/release-funds-payload";
