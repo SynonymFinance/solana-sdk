@@ -1,5 +1,5 @@
-import { Logger } from "winston";
-import { ethers } from "ethers";
+// import { Logger } from "winston";
+// import { ethers } from "ethers";
 import { createAnchorProvider, createSolanaConnection, createSolanaKeypair, getNetworkFromRpcUrl } from "./utils";
 import { rootLogger } from "./log";
 import { SOLANA_RELAYER_EOA, SOLANA_RELAYER_REWARD, SOLANA_RPC } from "./consts";

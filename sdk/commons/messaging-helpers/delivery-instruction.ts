@@ -2,18 +2,13 @@ import {
   encodeUint8,
   decodeUint8,
   encodeUint16,
-  encodeUint64,
   decodeUint16,
-  decodeUint64,
   encodeBytes,
   decodeBytes,
-  encodeUint32,
-  decodeUint32,
   concatUint8Arrays
 } from "./delivery-instruction-utils";
 
 import { MessageKey } from "./message-key";
-import { VaaKey } from "./vaa-key";
 
 export class DeliveryInstruction {
   targetChain: number;

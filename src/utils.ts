@@ -2,7 +2,6 @@ import * as anchor from "@coral-xyz/anchor";
 import { Connection, Keypair } from "@solana/web3.js";
 import { SolanaNetwork } from "../sdk/solana/synonym-solana-client";
 import { web3 } from "@coral-xyz/anchor";
-import { CHAIN_ID_SOLANA } from "@certusone/wormhole-sdk";
 import { SOLANA_DEFAULT_COMMITMENT_LEVEL } from "./consts";
 
 
