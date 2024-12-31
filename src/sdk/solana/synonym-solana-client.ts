@@ -2,7 +2,7 @@ import * as anchor from "@coral-xyz/anchor";
 import { AnchorProvider, Program } from "@coral-xyz/anchor";
 import { SolanaSpoke } from "../../ts-types/solana/solana_spoke";
 // import idl from "../../ts-types/solana/idl/solana_spoke.json";
-import { solanaSpokeIdl } from "../../ts-types";
+import { solanaSpokeIdl } from "../../ts-types/solana";
 import { InstructionBuilder } from "./instruction-builder";
 import { AccountFetcher } from "./account-fetcher";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
