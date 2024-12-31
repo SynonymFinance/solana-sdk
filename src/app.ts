@@ -3,7 +3,7 @@
 import { createAnchorProvider, createSolanaConnection, createSolanaKeypair, getNetworkFromRpcUrl } from "./utils";
 import { rootLogger } from "./log";
 import { SOLANA_RELAYER_EOA, SOLANA_RELAYER_REWARD, SOLANA_RPC } from "./consts";
-import { SynonymSolanaClient } from "../sdk/solana/synonym-solana-client";
+import { SynonymSolanaClient } from "./sdk/solana/synonym-solana-client";
 import { NATIVE_MINT } from "@solana/spl-token";
 import * as assert from "assert";
 import { PublicKey } from "@solana/web3.js";

@@ -8,7 +8,7 @@ import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 import { CONTRACTS, ParsedVaa } from "@certusone/wormhole-sdk";
 import { AddressLookupTableAccount, ConfirmOptions, PublicKey, Signer, TransactionInstruction, TransactionSignature } from "@solana/web3.js";
 import { buildV0Transaction } from "../commons/utils/lut";
-import { getNetworkFromRpcUrl } from "../../src/utils";
+import { getNetworkFromRpcUrl } from "../../utils";
 import { deriveUserMessageNoncePda, getUserMessageNonceValue, HubActionType, toBN } from "../commons/utils";
 
 export enum SolanaNetwork {

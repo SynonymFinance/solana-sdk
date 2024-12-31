@@ -16,7 +16,7 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "sourceMap": true,
-    // "rootDir": "src",
+    "rootDir": "src",
     "outDir": "lib/esm",
     // "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
@@ -24,6 +24,6 @@
     "noUnusedParameters": true,
     "noImplicitAny": true
   },
-  "include": ["src", "sdk", "ts-types"],
+  "include": ["src"],
   "exclude": ["node_modules", "**/__tests__/*"]
 }

@@ -1,5 +1,5 @@
 {
-  "name": "advanced-relayer-example",
+  "name": "solana-sdk",
   "version": "1.0.0",
   "description": "",
   "main": "./lib/cjs/index.js",
