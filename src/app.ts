@@ -1,26 +1,18 @@
-// import { Logger } from "winston";
-// import { ethers } from "ethers";
 import { createAnchorProvider, createSolanaConnection, createSolanaKeypair, getNetworkFromRpcUrl } from "./utils";
-import { rootLogger } from "./log";
 import { SOLANA_RELAYER_EOA, SOLANA_RELAYER_REWARD, SOLANA_RPC } from "./consts";
 import { SynonymSolanaClient } from "./sdk/solana/synonym-solana-client";
 import { NATIVE_MINT } from "@solana/spl-token";
 import * as assert from "assert";
 import { PublicKey } from "@solana/web3.js";
 
-// TODO: remove from SDK - move to off-chain relayer and just call client from sdk to updateDeliveryPrice()
-// import { DeliveryPriceUpdater } from "../sdk/solana/delivery-price-updater";
 
-async function main() {
-  
-  const logger = rootLogger("info", "text");
-
+async function main() {  
   const solanaConnection = createSolanaConnection(SOLANA_RPC);
   const solanaKeypair = createSolanaKeypair(SOLANA_RELAYER_EOA);
   const anchorProvider = createAnchorProvider(solanaConnection, solanaKeypair);
 
-  logger.debug(`Relayer Solana wallet balance:  ${await anchorProvider.connection.getBalance(anchorProvider.wallet.publicKey)}`);
-  logger.debug(`Relayer Solana wallet address:  ${anchorProvider.wallet.publicKey}`);
+  console.log(`Relayer Solana wallet balance:  ${await anchorProvider.connection.getBalance(anchorProvider.wallet.publicKey)}`);
+  console.log(`Relayer Solana wallet address:  ${anchorProvider.wallet.publicKey}`);
 
   const wormholeContracts = SynonymSolanaClient.getWormholeContractsForSolanaNetwork(
     getNetworkFromRpcUrl(anchorProvider.connection.rpcEndpoint)
