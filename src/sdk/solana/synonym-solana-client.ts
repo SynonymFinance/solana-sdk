@@ -1,12 +1,12 @@
 import * as anchor from "@coral-xyz/anchor";
 import { AnchorProvider, Program } from "@coral-xyz/anchor";
 import { SolanaSpoke } from "../../ts-types/solana/solana_spoke";
-// import idl from "../../ts-types/solana/idl/solana_spoke.json";
 import { solanaSpokeIdl } from "../../ts-types/solana";
 import { InstructionBuilder } from "./instruction-builder";
 import { AccountFetcher } from "./account-fetcher";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
-import { CONTRACTS, ParsedVaa } from "@certusone/wormhole-sdk";
+import { ParsedVaa } from "../commons"
+import { contracts } from "@wormhole-foundation/sdk";
 import { AddressLookupTableAccount, ConfirmOptions, PublicKey, Signer, TransactionInstruction, TransactionSignature } from "@solana/web3.js";
 import { buildV0Transaction } from "../commons/utils/lut";
 import { getNetworkFromRpcUrl } from "../../utils";
@@ -42,7 +42,7 @@ export class SynonymSolanaClient {
     const wormholeContracts = SynonymSolanaClient.getWormholeContractsForSolanaNetwork(
       this.getNetworkFromConnection()
     );
-    this.coreBridgePid = new PublicKey(wormholeContracts.solana.core);
+    this.coreBridgePid = new PublicKey(wormholeContracts.core);
 
     // In Anchor > 0.30 program address is already in IDL and we do not need to pass it separately
     this.spokeProgram = new Program(solanaSpokeIdl as SolanaSpoke, anchorProvider);
@@ -268,13 +268,20 @@ export class SynonymSolanaClient {
     return txSignature;
   }
 
-  static getWormholeContractsForSolanaNetwork(network: SolanaNetwork) {
+  // TODO: test it
+  static getWormholeContractsForSolanaNetwork(network: SolanaNetwork) : WormholeContracts {
     if (network == SolanaNetwork.MAINNET) {
-      return CONTRACTS.MAINNET;
+      return {
+        core: contracts.coreBridge("Mainnet", "Solana"),
+        tokenBridge: contracts.tokenBridge("Mainnet", "Solana"),
+      }
     } else {
       // for localhost and devnet use Wormhole testnet addresses
       // NOTE: it might by confusing but in Wormhole naming they call Solana devnet - "testnet" (as it is main network for testing)
-      return CONTRACTS.TESTNET
+      return {
+        core: contracts.coreBridge("Testnet", "Solana"),
+        tokenBridge: contracts.tokenBridge("Testnet", "Solana"),
+      }
     }
   }
 
@@ -282,4 +289,9 @@ export class SynonymSolanaClient {
     return getNetworkFromRpcUrl(this.anchorProvider.connection.rpcEndpoint);
   }
 
+}
+
+export interface WormholeContracts {
+  core: string;
+  tokenBridge: string
 }

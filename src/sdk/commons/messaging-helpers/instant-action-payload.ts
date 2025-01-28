@@ -21,16 +21,16 @@ export class InstantActionPayload {
     user: Uint8Array,
     action: number,
     token: Uint8Array,
-    amount: ethers.BigNumber,
-    nonce: ethers.BigNumber,
-    spokeDeposits: ethers.BigNumber,
+    amount: bigint,
+    nonce: bigint,
+    spokeDeposits: bigint,
   ) {
     this.user = user;
     this.action = action;
     this.token = token;
-    this.amount = ethers.utils.arrayify(amount);
-    this.nonce = ethers.utils.arrayify(nonce);
-    this.spokeDeposits = ethers.utils.arrayify(spokeDeposits);
+    this.amount = ethers.toBeArray(amount);
+    this.nonce = ethers.toBeArray(nonce);
+    this.spokeDeposits = ethers.toBeArray(spokeDeposits);
   }
 
   public static from(
@@ -38,16 +38,16 @@ export class InstantActionPayload {
       user: Uint8Array,
       action: number,
       token: Uint8Array,
-      amount: ethers.BigNumber,
-      nonce: ethers.BigNumber,
-      spokeDeposits: ethers.BigNumber,
+      amount: bigint,
+      nonce: bigint,
+      spokeDeposits: bigint,
     }
   ): InstantActionPayload {
     return new InstantActionPayload(data.user, data.action, data.token, data.amount, data.nonce, data.spokeDeposits);
   }
 
   public encode(): Buffer {
-    let encodedMessage = ethers.utils.defaultAbiCoder.encode(
+    let encodedMessage = ethers.AbiCoder.defaultAbiCoder().encode(
       INSTANT_ACTION_PAYLOAD_ABI_FORMAT,
       [
         this.user,
@@ -71,17 +71,25 @@ export class InstantActionPayload {
     if (!hexString.startsWith('0x')) {
       hexString = "0x" + hexString;
     }
-    const decodedArray = ethers.utils.defaultAbiCoder.decode(
+    const decodedArray = ethers.AbiCoder.defaultAbiCoder().decode(
       INSTANT_ACTION_PAYLOAD_ABI_FORMAT,
       hexString
     );
 
-    const user = ethers.utils.arrayify(decodedArray[0]);                               
-    const action = decodedArray[1];                               
-    const token = ethers.utils.arrayify(decodedArray[2]);        
-    const amount = ethers.BigNumber.from(ethers.utils.arrayify(decodedArray[3]));        
-    const nonce = ethers.BigNumber.from(ethers.utils.arrayify(decodedArray[4]));        
-    const spokeDeposits = ethers.BigNumber.from(ethers.utils.arrayify(decodedArray[5]));        
+    // --> ethers v5 version left for reference if something would not work
+    // const user = ethers.utils.arrayify(decodedArray[0]);                               
+    // const action = decodedArray[1];                               
+    // const token = ethers.utils.arrayify(decodedArray[2]);        
+    // const amount = ethers.BigNumber.from(ethers.utils.arrayify(decodedArray[3]));        
+    // const nonce = ethers.BigNumber.from(ethers.utils.arrayify(decodedArray[4]));        
+    // const spokeDeposits = ethers.BigNumber.from(ethers.utils.arrayify(decodedArray[5])); 
+    
+    const user: Uint8Array = ethers.getBytes(decodedArray[0]);
+    const action: number = decodedArray[1];
+    const token: Uint8Array = ethers.getBytes(decodedArray[2]);
+    const amount: bigint = BigInt(decodedArray[3]);
+    const nonce: bigint = BigInt(decodedArray[4]);
+    const spokeDeposits: bigint = BigInt(decodedArray[5]);
 
     const decodedMessage = new InstantActionPayload(
       user,

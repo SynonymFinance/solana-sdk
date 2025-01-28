@@ -9,3 +9,4 @@ export * from "./request-pairing-payload";
 export * from "./tunnel-message";
 export * from "./user-action-payload";
 export * from "./vaa-key";
+export * from "./parsed-vaa";

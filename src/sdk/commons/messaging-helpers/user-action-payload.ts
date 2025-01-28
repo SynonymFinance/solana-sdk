@@ -17,22 +17,22 @@ export class UserActionPayload {
     user: Uint8Array,
     action: number,
     asset: Uint8Array,
-    amount: ethers.BigNumber,
+    amount: bigint,
   ) {
     this.user = user;
     this.action = action;
     this.asset = asset;
-    this.amount = ethers.utils.arrayify(amount);
+    this.amount = ethers.toBeArray(amount);
   }
 
   public static from(
-    data: { user: Uint8Array, action: number, asset: Uint8Array, amount: ethers.BigNumber }
+    data: { user: Uint8Array, action: number, asset: Uint8Array, amount: bigint }
   ): UserActionPayload {
     return new UserActionPayload(data.user, data.action, data.asset, data.amount);
   }
 
   public encode(): Buffer {
-    let encodedMessage = ethers.utils.defaultAbiCoder.encode(
+    let encodedMessage = ethers.AbiCoder.defaultAbiCoder().encode(
       USER_ACTION_PAYLOAD_ABI_FORMAT,
       [
         this.user,
@@ -56,15 +56,21 @@ export class UserActionPayload {
     if (!hexString.startsWith('0x')) {
       hexString = "0x" + hexString;
     }
-    const decodedArray = ethers.utils.defaultAbiCoder.decode(
+    const decodedArray = ethers.AbiCoder.defaultAbiCoder().decode(
       USER_ACTION_PAYLOAD_ABI_FORMAT,
       hexString
     );
 
-    const user = ethers.utils.arrayify(decodedArray[0]);                               
-    const action = decodedArray[1];                               
-    const asset = ethers.utils.arrayify(decodedArray[2]);        
-    const amount = ethers.BigNumber.from(ethers.utils.arrayify(decodedArray[3]));        
+    // --> ethers v5 version for reference
+    // const user = ethers.utils.arrayify(decodedArray[0]);                               
+    // const action = decodedArray[1];                               
+    // const asset = ethers.utils.arrayify(decodedArray[2]);        
+    // const amount = ethers.BigNumber.from(ethers.utils.arrayify(decodedArray[3]));        
+
+    const user: Uint8Array = ethers.getBytes(decodedArray[0]);
+    const action: number = decodedArray[1];
+    const asset: Uint8Array = ethers.getBytes(decodedArray[2]);
+    const amount: bigint = BigInt(decodedArray[3]);
 
     const decodedMessage = new UserActionPayload(
       user,

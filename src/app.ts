@@ -17,7 +17,8 @@ async function main() {
   const wormholeContracts = SynonymSolanaClient.getWormholeContractsForSolanaNetwork(
     getNetworkFromRpcUrl(anchorProvider.connection.rpcEndpoint)
   );
-  const coreBridgePid = new PublicKey(wormholeContracts.solana.core);
+  console.log("wormhole contracts : ", wormholeContracts);
+  const coreBridgePid = new PublicKey(wormholeContracts.core);
 
   console.log("Core bridge PID: ", coreBridgePid.toBase58());
 

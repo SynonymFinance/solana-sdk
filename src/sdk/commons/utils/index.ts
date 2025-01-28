@@ -5,9 +5,9 @@ export * from "./action-types";
 import * as anchor from "@coral-xyz/anchor";
 import { BN } from "@coral-xyz/anchor";
 import { PublicKey, LAMPORTS_PER_SOL, Connection, Keypair, SystemProgram, Transaction, sendAndConfirmTransaction, SYSVAR_CLOCK_PUBKEY, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
-import * as wormhole from "@certusone/wormhole-sdk/lib/cjs/solana/wormhole";
 import { getAccount, getOrCreateAssociatedTokenAccount, TOKEN_PROGRAM_ID, transferChecked } from "@solana/spl-token";
 import { SolanaSpoke } from "../../../ts-types/solana/solana_spoke";
+import { utils as coreUtils } from '@wormhole-foundation/sdk-solana-core';
 
 export const WRAPPED_WETH_DECIMALS = 8;
 export const AIRDROP_SOL_AMOUNT = 42 * LAMPORTS_PER_SOL;
@@ -96,7 +96,7 @@ export async function getTokenBridgeSequenceValue(
   core_bridge_pid: PublicKey,
   token_bridge_pid: PublicKey
 ): Promise<bigint> {
-  const sequenceTracker = await wormhole.getProgramSequenceTracker(
+  const sequenceTracker = await coreUtils.getProgramSequenceTracker(
     connection,
     token_bridge_pid,
     core_bridge_pid
@@ -123,7 +123,7 @@ export async function getCustomWormholeEmitterSequenceValue(
   let sequence = 0n;
   // if this is first use than pda will not exist and seq value should be 0
   if ((await connection.getAccountInfo(customEmitterWormholeSequencePda)) != null ) { 
-    const sequenceTracker = await wormhole.getProgramSequenceTracker(
+    const sequenceTracker = await coreUtils.getProgramSequenceTracker(
       connection,
       emitterProgramId,
       core_bridge_pid

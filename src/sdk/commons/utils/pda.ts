@@ -1,6 +1,6 @@
 import * as anchor from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
-import { deriveAddress } from "@certusone/wormhole-sdk/lib/cjs/solana";
+import { utils } from '@wormhole-foundation/sdk-solana';
 import { PublicKeyInitData } from "@solana/web3.js";
 
 /**
@@ -18,7 +18,7 @@ export function deriveWormholeCoreMessageKey(
   sequence: bigint,
   signerKey: PublicKey
 ) {
-  return deriveAddress(
+  return utils.deriveAddress(
     [
       Buffer.from("sent"),
       (() => {
@@ -47,7 +47,7 @@ export function deriveTokenBridgeMessageKey(
   sequence: bigint,
   signerKey: PublicKey
 ) {
-  return deriveAddress(
+  return utils.deriveAddress(
     [
       Buffer.from("bridged"),
       (() => {

@@ -34,33 +34,33 @@ export class TunnelMessage {
     source: MessageSource,
     target: MessageTarget,
     token: Uint8Array,
-    amount: ethers.BigNumber,
+    amount: bigint,
     receiverValue: Uint8Array,
     finality: MessageFinality,
   ) {
     this.source = source;
     this.target = target;
     this.token = token;
-    this.amount = ethers.utils.arrayify(amount);
+    this.amount = ethers.getBytes(ethers.toBeHex(amount));
     this.receiverValue = receiverValue;
     this.finality = finality;
   }
 
   public static from(
-    data: { source: MessageSource; target: MessageTarget; token: Uint8Array; amount: ethers.BigNumber; receiverValue: ethers.BigNumber; finality: number; }
+    data: { source: MessageSource; target: MessageTarget; token: Uint8Array; amount: bigint; receiverValue: bigint; finality: number; }
   ): TunnelMessage {
     const source = data.source;
     const target = data.target;
     const token = data.token;
     const amount = data.amount;
-    const receiverValue = ethers.utils.arrayify(data.receiverValue);
+    const receiverValue = ethers.toBeArray(data.receiverValue);
     const finality = data.finality;
 
     return new TunnelMessage(source, target, token, amount, receiverValue, finality);
   }
 
   public encode(): Buffer {
-    let encodedMessage = ethers.utils.defaultAbiCoder.encode(
+    let encodedMessage = ethers.AbiCoder.defaultAbiCoder().encode(
       MESSAGE_TUNNEL_ABI_FORMAT,
       [
         [this.source.chainId, this.source.sender, this.source.refundRecipient],
@@ -96,27 +96,27 @@ export class TunnelMessage {
       hexString = "0x" + hexString;
     }
 
-    const decodedArray = ethers.utils.defaultAbiCoder.decode(
+    const decodedArray = ethers.AbiCoder.defaultAbiCoder().decode(
       MESSAGE_TUNNEL_ABI_FORMAT,
       hexString
     );
 
     const source = new MessageSource(  // tuple(uint16 chainId, bytes32 sender, bytes32 refundRecipient)
       decodedArray[0].chainId,                        
-      ethers.utils.arrayify(decodedArray[0].sender), 
-      ethers.utils.arrayify(decodedArray[0].refundRecipient)
+      ethers.getBytes(decodedArray[0].sender), 
+      ethers.getBytes(decodedArray[0].refundRecipient)
     )
     const target = new MessageTarget( // tuple(uint16 chainId, bytes32 recipient, bytes4 selector, bytes payload)
       decodedArray[1].chainId,
-      ethers.utils.arrayify(decodedArray[1].recipient),
-      ethers.utils.arrayify(decodedArray[1].selector),
-      ethers.utils.arrayify(decodedArray[1].payload)
+      ethers.getBytes(decodedArray[1].recipient),
+      ethers.getBytes(decodedArray[1].selector),
+      ethers.getBytes(decodedArray[1].payload)
     );
 
-    const token = ethers.utils.arrayify(decodedArray[2]);                         // bytes32 token
-    const amount = ethers.BigNumber.from(ethers.utils.arrayify(decodedArray[3])); // uint256 amount
-    const receiverValue = ethers.utils.arrayify(decodedArray[4]);                 // uint256 receiverValue
-    const finality = decodedArray[5];                                             // uint8 finality
+    const token: Uint8Array = ethers.getBytes(decodedArray[2]);         // bytes32 token
+    const amount: bigint = BigInt(decodedArray[3]);                     // uint256 amount
+    const receiverValue: Uint8Array = ethers.getBytes(decodedArray[4]); // uint256 receiverValue
+    const finality: MessageFinality = decodedArray[5];                  // uint8 finality
 
     const decodedMessage = new TunnelMessage(
       source,

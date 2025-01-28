@@ -1,14 +1,14 @@
 import { BN, Program } from "@coral-xyz/anchor";
 import { SolanaSpoke } from "../../ts-types/solana/solana_spoke";
 import { Keypair, PublicKey, TransactionInstruction } from "@solana/web3.js";
-import { derivePostedVaaKey, getPostMessageCpiAccounts } from "@certusone/wormhole-sdk/lib/cjs/solana/wormhole";
+import { utils as coreUtils } from '@wormhole-foundation/sdk-solana-core';
 import { getAssociatedTokenAddressSync, NATIVE_MINT } from "@solana/spl-token";
 import { DeliveryInstruction } from "../commons/messaging-helpers/delivery-instruction";
 import { deriveConsumedNoncePda, deriveWormholeCoreMessageKey } from "../commons/utils/pda";
 import { TunnelMessage } from "../commons/messaging-helpers/tunnel-message";
 import { ReleaseFundsPayload } from "../commons/messaging-helpers/release-funds-payload";
 import { ethers } from "ethers";
-import { ParsedVaa } from "@certusone/wormhole-sdk";
+import { ParsedVaa } from "../commons";
 import { HubActionType } from "../commons/utils";
 
 export class InstructionBuilder {
@@ -38,15 +38,15 @@ export class InstructionBuilder {
     relayerKeypair: Keypair,
     coreBridgePid: PublicKey,
   ): Promise<TransactionInstruction> {
-    const deliveryInstructionVaaAddress = derivePostedVaaKey(coreBridgePid, deliveryInstructionVaa.hash);
+    const deliveryInstructionVaaAddress = coreUtils.derivePostedVaaKey(coreBridgePid, deliveryInstructionVaa.hash);
     const deliveryInstruction = DeliveryInstruction.decode(deliveryInstructionVaa.payload);
     const tunnelMessage = TunnelMessage.decode(Buffer.from(deliveryInstruction.payload));
     const releaseFundsPayload = ReleaseFundsPayload.decode(Buffer.from(tunnelMessage.target.payload));
 
     const recipient = new PublicKey(releaseFundsPayload.user);
     const mint = new PublicKey(releaseFundsPayload.token);
-    const userMessageNonce = ethers.BigNumber.from(releaseFundsPayload.nonce);
-    const consumedNoncePda = deriveConsumedNoncePda(this.spokeProgram.programId, userMessageNonce.toBigInt(), recipient);
+    const userMessageNonce = BigInt(ethers.hexlify(releaseFundsPayload.nonce));
+    const consumedNoncePda = deriveConsumedNoncePda(this.spokeProgram.programId, userMessageNonce, recipient);
 
     // make sure target address is spoke
     if (Buffer.from(deliveryInstruction.targetAddress).toString("hex") != this.spokeProgram.programId.toBuffer().toString("hex")) {
@@ -81,7 +81,7 @@ export class InstructionBuilder {
       userMessageNonce,
       senderKeypair.publicKey
     );
-    const wormholeAccounts = getPostMessageCpiAccounts(
+    const wormholeAccounts = coreUtils.getPostMessageCpiAccounts(
       this.spokeProgram.programId,
       this.coreBridgePid,
       senderKeypair.publicKey, // payer
@@ -123,7 +123,7 @@ export class InstructionBuilder {
       userMessageNonce,
       senderKeypair.publicKey
     );
-    const wormholeAccounts = getPostMessageCpiAccounts(
+    const wormholeAccounts = coreUtils.getPostMessageCpiAccounts(
       this.spokeProgram.programId,
       this.coreBridgePid,
       senderKeypair.publicKey, // payer
@@ -168,7 +168,7 @@ export class InstructionBuilder {
       userMessageNonce,
       senderKeypair.publicKey
     );
-    const wormholeAccounts = getPostMessageCpiAccounts(
+    const wormholeAccounts = coreUtils.getPostMessageCpiAccounts(
       this.spokeProgram.programId,
       this.coreBridgePid,
       senderKeypair.publicKey, // payer

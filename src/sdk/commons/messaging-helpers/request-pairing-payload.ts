@@ -24,7 +24,7 @@ export class RequestPairingPayload {
   }
 
   public encode(): Buffer {
-    let encodedMessage = ethers.utils.defaultAbiCoder.encode(
+    let encodedMessage = ethers.AbiCoder.defaultAbiCoder().encode(
       REQUEST_PAIRING_PAYLOAD_ABI_FORMAT,
       [
         this.newAccount,
@@ -44,13 +44,17 @@ export class RequestPairingPayload {
     if (!hexString.startsWith('0x')) {
       hexString = "0x" + hexString;
     }
-    const decodedArray = ethers.utils.defaultAbiCoder.decode(
+    const decodedArray = ethers.AbiCoder.defaultAbiCoder().decode(
       REQUEST_PAIRING_PAYLOAD_ABI_FORMAT,
       hexString
     );
 
-    const newAccount = ethers.utils.arrayify(decodedArray[0]);                               
-    const userId = ethers.utils.arrayify(decodedArray[1]);        
+    
+    // --> ethers v5 version left for reference if something would not work
+    // const newAccount = ethers.utils.arrayify(decodedArray[0]);                               
+    // const userId = ethers.utils.arrayify(decodedArray[1]);        
+    const newAccount: Uint8Array = ethers.getBytes(decodedArray[0]);
+    const userId: Uint8Array = ethers.getBytes(decodedArray[1]);
 
     const decodedMessage = new RequestPairingPayload(
       newAccount,

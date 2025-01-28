@@ -18,14 +18,14 @@ export class ReleaseFundsPayload {
   constructor(
     user: Uint8Array,
     token: Uint8Array,
-    amount: ethers.BigNumber,
-    nonce: ethers.BigNumber,
+    amount: bigint,
+    nonce: bigint,
     unwrapWeth: boolean,
   ) {
     this.user = user;
     this.token = token;
-    this.amount = ethers.utils.arrayify(amount);
-    this.nonce = ethers.utils.arrayify(nonce);
+    this.amount = ethers.toBeArray(amount);
+    this.nonce = ethers.toBeArray(nonce);
     this.unwrapWeth = unwrapWeth;
   }
 
@@ -33,8 +33,8 @@ export class ReleaseFundsPayload {
     data: { 
       user: Uint8Array,
       token: Uint8Array,
-      amount: ethers.BigNumber,
-      nonce: ethers.BigNumber,
+      amount: bigint,
+      nonce: bigint,
       unwrapWeth: boolean,
     }
   ): ReleaseFundsPayload {
@@ -42,7 +42,7 @@ export class ReleaseFundsPayload {
   }
 
   public encode(): Buffer {
-    let encodedMessage = ethers.utils.defaultAbiCoder.encode(
+    let encodedMessage = ethers.AbiCoder.defaultAbiCoder().encode(
       RELEASE_FUNDS_PAYLOAD_ABI_FORMAT,
       [
         this.user,
@@ -65,16 +65,22 @@ export class ReleaseFundsPayload {
     if (!hexString.startsWith('0x')) {
       hexString = "0x" + hexString;
     }
-    const decodedArray = ethers.utils.defaultAbiCoder.decode(
+    const decodedArray = ethers.AbiCoder.defaultAbiCoder().decode(
       RELEASE_FUNDS_PAYLOAD_ABI_FORMAT,
       hexString
     );
 
-    const user = ethers.utils.arrayify(decodedArray[0]);                               
-    const token = ethers.utils.arrayify(decodedArray[1]);        
-    const amount = ethers.BigNumber.from(ethers.utils.arrayify(decodedArray[2]));        
-    const nonce = ethers.BigNumber.from(ethers.utils.arrayify(decodedArray[3]));        
-    const unwrapWeth = Boolean(decodedArray[4]);
+    // --> ethers v5 version left for reference if something would not work
+    // const user = ethers.utils.arrayify(decodedArray[0]);                               
+    // const token = ethers.utils.arrayify(decodedArray[1]);        
+    // const amount = ethers.BigNumber.from(ethers.utils.arrayify(decodedArray[2]));        
+    // const nonce = ethers.BigNumber.from(ethers.utils.arrayify(decodedArray[3]));        
+    // const unwrapWeth = Boolean(decodedArray[4]);
+    const user: Uint8Array = ethers.getBytes(decodedArray[0]);
+    const token: Uint8Array = ethers.getBytes(decodedArray[1]);
+    const amount: bigint = BigInt(decodedArray[2]);
+    const nonce: bigint = BigInt(decodedArray[3]);
+    const unwrapWeth: boolean = Boolean(decodedArray[4]);
 
     const decodedMessage = new ReleaseFundsPayload(
       user,
