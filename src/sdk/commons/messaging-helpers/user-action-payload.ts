@@ -3,32 +3,36 @@ import { ethers } from 'ethers';
 export const USER_ACTION_PAYLOAD_ABI_FORMAT = [
   "bytes32",   // user
   "uint8",     // action
-  "bytes32",   // asset
+  "bytes32",   // token
   "uint256",   // amount
+  "uint256",   // nonce
 ];
 
 export class UserActionPayload {
   user: Uint8Array;      // bytes32
   action: number;        // uint8
-  asset: Uint8Array;     // bytes32
+  token: Uint8Array;     // bytes32
   amount: Uint8Array;    // uint256
+  nonce: Uint8Array;    // uint256
 
   constructor(
     user: Uint8Array,
     action: number,
-    asset: Uint8Array,
+    token: Uint8Array,
     amount: ethers.BigNumber,
+    nonce: ethers.BigNumber,
   ) {
     this.user = user;
     this.action = action;
-    this.asset = asset;
+    this.token = token;
     this.amount = ethers.utils.arrayify(amount);
+    this.nonce = ethers.utils.arrayify(nonce);
   }
 
   public static from(
-    data: { user: Uint8Array, action: number, asset: Uint8Array, amount: ethers.BigNumber }
+    data: { user: Uint8Array, action: number, token: Uint8Array, amount: ethers.BigNumber, nonce: ethers.BigNumber }
   ): UserActionPayload {
-    return new UserActionPayload(data.user, data.action, data.asset, data.amount);
+    return new UserActionPayload(data.user, data.action, data.token, data.amount, data.nonce);
   }
 
   public encode(): Buffer {
@@ -37,8 +41,9 @@ export class UserActionPayload {
       [
         this.user,
         this.action,
-        this.asset,
+        this.token,
         this.amount,
+        this.nonce,
       ]
     );
 
@@ -61,16 +66,18 @@ export class UserActionPayload {
       hexString
     );
 
-    const user = ethers.utils.arrayify(decodedArray[0]);                               
-    const action = decodedArray[1];                               
-    const asset = ethers.utils.arrayify(decodedArray[2]);        
-    const amount = ethers.BigNumber.from(ethers.utils.arrayify(decodedArray[3]));        
+    const user = ethers.utils.arrayify(decodedArray[0]);
+    const action = decodedArray[1];
+    const token = ethers.utils.arrayify(decodedArray[2]);
+    const amount = ethers.BigNumber.from(ethers.utils.arrayify(decodedArray[3]));
+    const nonce = ethers.BigNumber.from(ethers.utils.arrayify(decodedArray[4]));
 
     const decodedMessage = new UserActionPayload(
       user,
       action,
-      asset,
+      token,
       amount,
+      nonce
     );
 
     return decodedMessage;

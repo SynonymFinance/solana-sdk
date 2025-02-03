@@ -1,6 +1,5 @@
 export * from "./delivery-instruction";
 export * from "./delivery-instruction-utils";
-export * from "./instant-action-payload";
 export * from "./message-key";
 export * from "./message-source";
 export * from "./message-target";
