@@ -19,8 +19,6 @@ export const USER_ACTION_MESSAGE_EVM_SELECTOR = Buffer.from("144f65c5", "hex");
 // Evm function selector for `IHub.pairingRequestMessage.selector`
 // Selector for: function pairingRequestMessage(tuple(uint16, bytes32, bytes32), address, uint256, bytes)
 export const PAIRING_REQUEST_MESSAGE_EVM_SELECTOR = Buffer.from("f3c93275", "hex");
-// Evm function selector for `IHub.instantActionMessage.selector`
-export const INSTANT_ACTION_MESSAGE_EVM_SELECTOR = Buffer.from(("d9a55f5c"), "hex");
 
 export class TunnelMessage {
   source: MessageSource;
