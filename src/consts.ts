@@ -3,7 +3,6 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-export const SOLANA_DEFAULT_COMMITMENT_LEVEL = "confirmed";
 
 export const SOLANA_RPC = process.env.SOLANA_RPC!;
 export const SOLANA_RELAYER_EOA = [process.env.SOLANA_PRIVATE_KEY!];

@@ -2,7 +2,7 @@ import * as anchor from "@coral-xyz/anchor";
 import { Connection, Keypair } from "@solana/web3.js";
 import { SolanaNetwork } from "./sdk/solana/synonym-solana-client";
 import { web3 } from "@coral-xyz/anchor";
-import { SOLANA_DEFAULT_COMMITMENT_LEVEL } from "./consts";
+export const SOLANA_DEFAULT_COMMITMENT_LEVEL = "confirmed";
 
 
 export function getNetworkFromRpcUrl(rpcUrl: string): SolanaNetwork {
@@ -11,7 +11,7 @@ export function getNetworkFromRpcUrl(rpcUrl: string): SolanaNetwork {
   for (const value of enumValues) {
     if (rpcUrl.includes(value)) {
       return value as SolanaNetwork; // Type assertion to ensure correct return type
-      }
+    }
   }
   // if no match it is an error
   throw Error(`Unable to find network type for ${rpcUrl}`);
@@ -29,7 +29,7 @@ export function createAnchorProvider(connection: Connection, keypair: Keypair): 
 
 // ProvidersOpts was part relayer engine lib 
 export function createSolanaConnection(solanaRpc: string): web3.Connection {
-  if(solanaRpc === undefined) {
+  if (solanaRpc === undefined) {
     throw Error("Solana rpc endpoint not defined");
   }
   console.log("Solana rpc: ", solanaRpc);

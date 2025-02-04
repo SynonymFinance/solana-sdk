@@ -42,3 +42,47 @@ If specific commit hash is required:
 ```
 "solana-sdk": "git+https://github.com/SynonymFinance/solana-sdk#0e01163c0e046c9253c3a976bf6f28e338010091"
 ```
+
+
+
+
+
+
+# **Releasing a New Version of the Package**
+
+## Prerequisites
+1. You must have an NPM account. (https://www.npmjs.com/)
+2. You must have the necessary permissions to publish the package.
+3. You must have the latest version of the package.
+
+## **Step 1: Update the Version**
+1. Open the `package.json` file.
+2. Update the `"version"` field according to [Semantic Versioning](https://semver.org/):
+   - `MAJOR.MINOR.PATCH` (e.g., change from `1.0.0` to `1.1.0` or `1.0.1`).
+
+
+## **Step 2: Build the Package**
+Run the following command to build the package:
+
+```
+npm run build
+```
+
+## **Step 3: Create a Package Archive File**
+Generate the .tgz package file by running the following command:
+
+```
+npm pack
+```
+
+## **Step 4: Publish the Package**
+Release the package to the public registry:
+
+```
+npm publish --access public
+```
+
+## **Step 5: Verify the Release**
+
+1.Go to the package's NPM page to confirm the version update.
+2.Verify that the package is available and that everything was published successfully.

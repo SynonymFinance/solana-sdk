@@ -1,18 +1,18 @@
 {
-  "name": "solana-sdk",
-  "version": "1.0.0",
-  "description": "",
+  "name": "@0xkaes/solana-sdk",
+  "version": "0.0.7",
+  "description": "SYNO Finance Solana SDK.",
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
   "engines": {
-    "node": "20.x"
+    "node": "21.x"
   },
   "scripts": {
     "start-test": "tsx src/app.ts",
     "clean": "rm -rf ./lib",
-    "build": "tsc -p ./tsconfig.json && tsc -p ./tsconfig-cjs.json && npm run copy-json-cjs && npm run copy-json-esm",
-    "copy-json-cjs": "cpx \"./src/ts-types/solana/idl/*.json\" lib/cjs/ts-types/solana/idl",
-    "copy-json-esm": "cpx \"./src/ts-types/solana/idl/*.json\" lib/esm/ts-types/solana/idl",
+    "build": "tsc -p ./tsconfig.json && tsc -p ./tsconfig-cjs.json --excludeFiles src/app.ts --excludeFiles src/consts.ts",
+    "copy-json-cjs": "find src -name '*.json' -not -path './src/app.ts' -not -path './src/consts.ts' -exec cp {} lib/cjs \\;",
+    "copy-json-esm": "find src -name '*.json' -not -path './src/app.ts' -not -path './src/consts.ts' -exec cp {} lib/esm \\;",
     "postinstall": "npm run build"
   },
   "dependencies": {
@@ -24,9 +24,15 @@
     "dotenv": "^16.4.5",
     "ethers": "^6"
   },
-  "keywords": [],
+  "keywords": [
+    "solana",
+    "sdk",
+    "web3",
+    "wormhole",
+    "anchor"
+  ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/winston": "^2.4.4",
     "cpx": "^1.5.0",
@@ -35,6 +41,24 @@
     "typescript": "^5.4.2"
   },
   "files": [
-    "lib"
-  ]
+    "lib",
+    "src",
+    "tsconfig.json",
+    "tsconfig-cjs.json"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "types": "./lib/cjs/index.d.ts",
+  "directories": {
+    "lib": "lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SynonymFinance/solana-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SynonymFinance/solana-sdk/issues"
+  },
+  "homepage": "https://github.com/SynonymFinance/solana-sdk#readme"
 }
