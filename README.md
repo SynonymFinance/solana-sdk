@@ -43,11 +43,6 @@ If specific commit hash is required:
 "solana-sdk": "git+https://github.com/SynonymFinance/solana-sdk#0e01163c0e046c9253c3a976bf6f28e338010091"
 ```
 
-
-
-
-
-
 # **Releasing a New Version of the Package**
 
 ## Prerequisites
@@ -65,21 +60,21 @@ If specific commit hash is required:
 Run the following command to build the package:
 
 ```
-npm run build
+yarn run build
 ```
 
 ## **Step 3: Create a Package Archive File**
 Generate the .tgz package file by running the following command:
 
 ```
-npm pack
+yarn pack
 ```
 
 ## **Step 4: Publish the Package**
 Release the package to the public registry:
 
 ```
-npm publish --access public
+yarn publish --access public
 ```
 
 ## **Step 5: Verify the Release**
