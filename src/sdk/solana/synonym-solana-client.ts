@@ -4,10 +4,9 @@ import { SolanaSpoke } from "../../ts-types/solana/solana_spoke";
 import { solanaSpokeIdl } from "../../ts-types/solana";
 import { InstructionBuilder } from "./instruction-builder";
 import { AccountFetcher } from "./account-fetcher";
-import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 import { CONTRACTS, ParsedVaa } from "@certusone/wormhole-sdk";
-import { AddressLookupTableAccount, ConfirmOptions, PublicKey, Signer, TransactionInstruction, TransactionSignature } from "@solana/web3.js";
-import { buildV0Transaction } from "../commons/utils/lut";
+import { PublicKey, TransactionSignature } from "@solana/web3.js";
+import { sendTxWithConfirmation } from "../commons/utils/lut";
 import { getNetworkFromRpcUrl } from "../../utils";
 import { deriveUserMessageNoncePda, getUserMessageNonceValue, HubActionType, toBN } from "../commons/utils";
 
@@ -233,7 +232,6 @@ export class SynonymSolanaClient {
 
   /**** Helpers ****/
 
-//   static getWormholeContractsForSolanaNetwork(network: SolanaNetwork): WormholeContracts {
   static getWormholeContractsForSolanaNetwork(network: SolanaNetwork) {
     if (network == SolanaNetwork.MAINNET) {
       return CONTRACTS.MAINNET;
@@ -249,8 +247,3 @@ export class SynonymSolanaClient {
   }
 
 }
-
-// export interface WormholeContracts {
-//   core: string;
-//   tokenBridge: string
-// }

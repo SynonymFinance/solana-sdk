@@ -1,6 +1,6 @@
 import { BN, Program } from "@coral-xyz/anchor";
 import { SolanaSpoke } from "../../ts-types/solana/solana_spoke";
-import { Keypair, PublicKey, TransactionInstruction } from "@solana/web3.js";
+import { PublicKey, TransactionInstruction } from "@solana/web3.js";
 import { derivePostedVaaKey, getPostMessageCpiAccounts } from "@certusone/wormhole-sdk/lib/cjs/solana/wormhole";
 import { getAssociatedTokenAddressSync, NATIVE_MINT } from "@solana/spl-token";
 import { DeliveryInstruction } from "../commons/messaging-helpers/delivery-instruction";
@@ -8,8 +8,6 @@ import { deriveConsumedNoncePda, deriveWormholeCoreMessageKey } from "../commons
 import { TunnelMessage } from "../commons/messaging-helpers/tunnel-message";
 import { ReleaseFundsPayload } from "../commons/messaging-helpers/release-funds-payload";
 import { ethers } from "ethers";
-// TODO: will be ok
-// import { ParsedVaa } from "../commons";
 import { ParsedVaa } from "@certusone/wormhole-sdk";
 import { HubActionType } from "../commons/utils";
 
