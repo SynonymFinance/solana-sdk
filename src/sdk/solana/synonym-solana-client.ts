@@ -1,7 +1,6 @@
 import * as anchor from "@coral-xyz/anchor";
 import { AnchorProvider, Program } from "@coral-xyz/anchor";
 import { SolanaSpoke } from "../../ts-types/solana/solana_spoke";
-// import idl from "../../ts-types/solana/idl/solana_spoke.json";
 import { solanaSpokeIdl } from "../../ts-types/solana";
 import { InstructionBuilder } from "./instruction-builder";
 import { AccountFetcher } from "./account-fetcher";
@@ -28,7 +27,7 @@ export class SynonymSolanaClient {
   private coreBridgePid: PublicKey;
   private relayerVault: PublicKey;
   private relayerRewardAccount: PublicKey;
-  private nodeWallet: NodeWallet; 
+  // private nodeWallet: NodeWallet;
 
   constructor(
     anchorProvider: AnchorProvider,
@@ -53,21 +52,17 @@ export class SynonymSolanaClient {
       this.coreBridgePid
     );
     this.accountFetcher = new AccountFetcher(this.spokeProgram);
-
-    // this is a different wrapper for anchor provider wallet
-    this.nodeWallet = this.anchorProvider.wallet as NodeWallet;
   }
 
   public async releaseFunds(deliveryInstructionVaa: ParsedVaa): Promise<TransactionSignature> {
     const releaseFundsIx = await this.instructionBuilder.buildReleaseFundsIx(
       deliveryInstructionVaa,
-      this.nodeWallet.payer,
+      this.anchorProvider.wallet.publicKey, // relayer address
       this.coreBridgePid,
     );
 
-    const txSignature = this.sendTxWithConfirmation(
+    const txSignature = sendTxWithConfirmation(
       this.anchorProvider,
-      [this.nodeWallet.payer],
       [releaseFundsIx]
     );
 
@@ -136,19 +131,24 @@ export class SynonymSolanaClient {
   public async updateDeliveryPrice(hubTxCostSol: bigint): Promise<[string, anchor.BN]> {
     const deliveryPriceConfig = await this.accountFetcher.fetchDeliveryPriceConfig();
 
-    const tx = await this.spokeProgram.methods
+    const ix = await this.spokeProgram.methods
       .updateDeliveryPrice(
         deliveryPriceConfig.spokeReleaseFundsTxCostSol,
         toBN(hubTxCostSol),
         null // do not update max delay
       )
       .accounts({
-        priceKeeper: this.nodeWallet.payer.publicKey
+        priceKeeper: this.anchorProvider.wallet.publicKey
       })
-      .signers([this.nodeWallet.payer])
-      .rpc();
-    
-    return [tx, deliveryPriceConfig.hubTxCostSol];
+      .instruction()
+
+    const txSignature = await sendTxWithConfirmation(
+      this.anchorProvider,
+      [ix]
+    );
+
+
+    return [txSignature, deliveryPriceConfig.hubTxCostSol];
   }
 
   /*** Tx builder ***/
@@ -158,20 +158,19 @@ export class SynonymSolanaClient {
     mint: PublicKey,
     amount: anchor.BN
   ): Promise<TransactionSignature> {
-    const userMessageNoncePda = deriveUserMessageNoncePda(this.spokeProgram.programId, this.nodeWallet.publicKey);
+    const userMessageNoncePda = deriveUserMessageNoncePda(this.spokeProgram.programId, this.anchorProvider.wallet.publicKey);
     let userMessageNonce = await getUserMessageNonceValue(this.anchorProvider.connection, userMessageNoncePda);
 
     const outboundTransferIx = await this.instructionBuilder.buildOutboundTransferIx(
       actionType,
-      this.nodeWallet.payer,
+      this.anchorProvider.wallet.publicKey, // sender
       mint,
       amount,
       userMessageNonce
     );
 
-    const txSignature = this.sendTxWithConfirmation(
+    const txSignature = sendTxWithConfirmation(
       this.anchorProvider,
-      [this.nodeWallet.payer],
       [outboundTransferIx]
     );
 
@@ -183,12 +182,12 @@ export class SynonymSolanaClient {
     mint: PublicKey,
     amount: anchor.BN,
   ): Promise<TransactionSignature> {
-    const userMessageNoncePda = deriveUserMessageNoncePda(this.spokeProgram.programId, this.nodeWallet.publicKey);
+    const userMessageNoncePda = deriveUserMessageNoncePda(this.spokeProgram.programId, this.anchorProvider.wallet.publicKey);
     let userMessageNonce = await getUserMessageNonceValue(this.anchorProvider.connection, userMessageNoncePda);
 
     const inboundTransferIx = await this.instructionBuilder.buildInboundTransferIx(
       actionType,
-      this.nodeWallet.payer,
+      this.anchorProvider.wallet.publicKey, // sender
       mint,
       amount,
       userMessageNonce
@@ -199,9 +198,8 @@ export class SynonymSolanaClient {
       units: 150_000,
     });
 
-    const txSignature = this.sendTxWithConfirmation(
+    const txSignature = sendTxWithConfirmation(
       this.anchorProvider,
-      [this.nodeWallet.payer],
       [computeIx, inboundTransferIx]
     );
 
@@ -211,11 +209,11 @@ export class SynonymSolanaClient {
   async pairAccountTx(
     userId: Buffer
   ): Promise<TransactionSignature> {
-    const userMessageNoncePda = deriveUserMessageNoncePda(this.spokeProgram.programId, this.nodeWallet.publicKey);
+    const userMessageNoncePda = deriveUserMessageNoncePda(this.spokeProgram.programId, this.anchorProvider.wallet.publicKey);
     let userMessageNonce = await getUserMessageNonceValue(this.anchorProvider.connection, userMessageNoncePda);
 
     const inboundTransferIx = await this.instructionBuilder.pairAccountIx(
-      this.nodeWallet.payer,
+      this.anchorProvider.wallet.publicKey, // sender
       userId,
       userMessageNonce
     );
@@ -225,9 +223,8 @@ export class SynonymSolanaClient {
       units: 150_000,
     });
 
-    const txSignature = this.sendTxWithConfirmation(
+    const txSignature = sendTxWithConfirmation(
       this.anchorProvider,
-      [this.nodeWallet.payer],
       [computeIx, inboundTransferIx]
     );
 
@@ -236,38 +233,7 @@ export class SynonymSolanaClient {
 
   /**** Helpers ****/
 
-   async sendTxWithConfirmation(
-    provider: anchor.AnchorProvider,
-    signers: Signer[],
-    instructions: TransactionInstruction[],
-    lookupTableAddress?: PublicKey,
-    confirmOptions?: ConfirmOptions
-  ): Promise<TransactionSignature> {
-  
-    let latestBlockhashData = await provider.connection.getLatestBlockhash();
-  
-    let lookupTableAccounts: AddressLookupTableAccount[] = [];
-    if(lookupTableAddress != null) {
-      const lookupTableAccount = await provider.connection
-        .getAddressLookupTable(lookupTableAddress)
-        .then((resp) => resp.value);
-      if(lookupTableAccount === null) {
-        throw new Error(`Lookup table account not found: ${lookupTableAddress.toBase58()}`);
-      }  
-      lookupTableAccounts = [lookupTableAccount];  
-    }
-    
-    const txV0 = buildV0Transaction(signers, instructions, latestBlockhashData.blockhash, lookupTableAccounts);
-  
-    // if commitment is not defined use default provider commitment
-    const commitment = confirmOptions === undefined ? provider.opts.commitment : confirmOptions.commitment;
-
-    // will send tx and wait for confirmation
-    const txSignature = await provider.sendAndConfirm(txV0, signers, { commitment });
-  
-    return txSignature;
-  }
-
+//   static getWormholeContractsForSolanaNetwork(network: SolanaNetwork): WormholeContracts {
   static getWormholeContractsForSolanaNetwork(network: SolanaNetwork) {
     if (network == SolanaNetwork.MAINNET) {
       return CONTRACTS.MAINNET;
@@ -283,3 +249,8 @@ export class SynonymSolanaClient {
   }
 
 }
+
+// export interface WormholeContracts {
+//   core: string;
+//   tokenBridge: string
+// }
