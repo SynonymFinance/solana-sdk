@@ -7,8 +7,8 @@ import { PublicKey } from "@solana/web3.js";
 // import { Provider, SolanaAdapter, useAppKitConnection } from "@reown/appkit-adapter-solana/react";
 // import type { Provider } from '@reown/appkit-adapter-solana'
 // import { useAppKitAccount, useAppKitProvider } from '@reown/appkit/react'
-import { AnchorProvider } from "@coral-xyz/anchor";
-import { exit } from "process";
+// import { AnchorProvider } from "@coral-xyz/anchor";
+// import { exit } from "process";
 // import { AnchorWallet } from '@solana/wallet-adapter-react'
 
 
