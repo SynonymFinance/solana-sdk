@@ -4,6 +4,12 @@ import { SynonymSolanaClient } from "./sdk/solana/synonym-solana-client";
 import { NATIVE_MINT } from "@solana/spl-token";
 import * as assert from "assert";
 import { PublicKey } from "@solana/web3.js";
+// import { Provider, SolanaAdapter, useAppKitConnection } from "@reown/appkit-adapter-solana/react";
+// import type { Provider } from '@reown/appkit-adapter-solana'
+// import { useAppKitAccount, useAppKitProvider } from '@reown/appkit/react'
+import { AnchorProvider } from "@coral-xyz/anchor";
+import { exit } from "process";
+// import { AnchorWallet } from '@solana/wallet-adapter-react'
 
 
 async function main() {  
@@ -14,6 +20,28 @@ async function main() {
   console.log(`Relayer Solana wallet balance:  ${await anchorProvider.connection.getBalance(anchorProvider.wallet.publicKey)}`);
   console.log(`Relayer Solana wallet address:  ${anchorProvider.wallet.publicKey}`);
 
+  // const { walletProvider } = useAppKitProvider<Provider>("solana");
+
+  // if (!walletProvider?.publicKey || !walletProvider?.signTransaction) {
+  //   console.error('Wallet not connected or missing required methods');
+  //   exit(0);
+  // }
+
+  // const walletFromAppKitProvider = {
+  //   publicKey: walletProvider.publicKey,
+  //   signTransaction: walletProvider.signTransaction.bind(walletProvider),
+  //   signAllTransactions: walletProvider.signAllTransactions?.bind(walletProvider),
+  // }
+
+  // const testAnchorProvider = new AnchorProvider(
+  //   solanaConnection,
+  //   walletFromAppKitProvider,
+  //   {
+  //     commitment: 'confirmed',
+  //   },
+  // )
+  // const { walletProvider } = useAppKitProvider<Provider>('solana')
+
   const wormholeContracts = SynonymSolanaClient.getWormholeContractsForSolanaNetwork(
     getNetworkFromRpcUrl(anchorProvider.connection.rpcEndpoint)
   );
@@ -22,8 +50,11 @@ async function main() {
 
   console.log("Core bridge PID: ", coreBridgePid.toBase58());
 
+  console.log("anchor provider wallet: ", anchorProvider.wallet);
+
   const spokeClient = new SynonymSolanaClient(
     anchorProvider,
+    // testAnchorProvider,
     solanaKeypair.publicKey,
     SOLANA_RELAYER_REWARD
   );

@@ -1,6 +1,6 @@
 import { BN, Program } from "@coral-xyz/anchor";
 import { SolanaSpoke } from "../../ts-types/solana/solana_spoke";
-import { Keypair, PublicKey, TransactionInstruction } from "@solana/web3.js";
+import { PublicKey, TransactionInstruction } from "@solana/web3.js";
 import { utils as coreUtils } from '@wormhole-foundation/sdk-solana-core';
 import { getAssociatedTokenAddressSync, NATIVE_MINT } from "@solana/spl-token";
 import { DeliveryInstruction } from "../commons/messaging-helpers/delivery-instruction";
@@ -13,8 +13,6 @@ import { HubActionType } from "../commons/utils";
 
 export class InstructionBuilder {
   private spokeProgram: Program<SolanaSpoke>;
-  // private vaultConfigPda: PublicKey;
-  // private customEmitterPda: PublicKey;
   private relayerVault: PublicKey;
   private relayerRewardAccount: PublicKey;
   private coreBridgePid: PublicKey;
@@ -26,8 +24,6 @@ export class InstructionBuilder {
     coreBridgePid: PublicKey
   ) {
     this.spokeProgram = spokeProgram;
-    // this.vaultConfigPda = deriveVaultConfigPda(this.spokeProgram.programId);
-    // this.customEmitterPda = deriveCustomEmitterPda(this.spokeProgram.programId);
     this.relayerVault = relayerVault;
     this.relayerRewardAccount = relayerRewardAccount;
     this.coreBridgePid = coreBridgePid;
@@ -35,7 +31,7 @@ export class InstructionBuilder {
 
   public async buildReleaseFundsIx(
     deliveryInstructionVaa: ParsedVaa,
-    relayerKeypair: Keypair,
+    relayerAddress: PublicKey,
     coreBridgePid: PublicKey,
   ): Promise<TransactionInstruction> {
     const deliveryInstructionVaaAddress = coreUtils.derivePostedVaaKey(coreBridgePid, deliveryInstructionVaa.hash);
@@ -56,14 +52,13 @@ export class InstructionBuilder {
     const ix = this.spokeProgram.methods
       .releaseFunds(Array.from(deliveryInstructionVaa.hash))
       .accounts({
-        relayer: relayerKeypair.publicKey,
+        relayer: relayerAddress,
         mint,
         recipient,
         // @ts-ignore: this Pda must be passed as it has complicated seed and Anchor TS client can't derive it 
         consumedNonce: consumedNoncePda,
         deliveryInstructionVaa: deliveryInstructionVaaAddress,
       })
-      .signers([relayerKeypair])
       .instruction();
 
     return ix;
@@ -71,7 +66,7 @@ export class InstructionBuilder {
 
   public async buildOutboundTransferIx(
     actionType: HubActionType,
-    senderKeypair: Keypair,
+    senderAddress: PublicKey,
     mint: PublicKey,
     amount: BN,
     userMessageNonce: bigint
@@ -79,12 +74,12 @@ export class InstructionBuilder {
     const wormholeMessagePda = deriveWormholeCoreMessageKey(
       this.spokeProgram.programId,
       userMessageNonce,
-      senderKeypair.publicKey
+      senderAddress
     );
     const wormholeAccounts = coreUtils.getPostMessageCpiAccounts(
       this.spokeProgram.programId,
       this.coreBridgePid,
-      senderKeypair.publicKey, // payer
+      senderAddress, // payer
       wormholeMessagePda
     );
 
@@ -98,14 +93,13 @@ export class InstructionBuilder {
     const ix = await method
       .accounts({
         generic: {
-          sender: senderKeypair.publicKey,
+          sender: senderAddress,
           relayerVault: this.relayerVault,
           relayerRewardAccount: this.relayerRewardAccount,
           mint,
           ...wormholeAccounts,
         }
       })
-      .signers([senderKeypair])
       .instruction()
 
     return ix;
@@ -113,7 +107,7 @@ export class InstructionBuilder {
 
   public async buildInboundTransferIx(
     actionType: HubActionType,
-    senderKeypair: Keypair,
+    senderAddress: PublicKey,
     mint: PublicKey,
     amount: BN,
     userMessageNonce: bigint
@@ -121,17 +115,17 @@ export class InstructionBuilder {
     const wormholeMessagePda = deriveWormholeCoreMessageKey(
       this.spokeProgram.programId,
       userMessageNonce,
-      senderKeypair.publicKey
+      senderAddress
     );
     const wormholeAccounts = coreUtils.getPostMessageCpiAccounts(
       this.spokeProgram.programId,
       this.coreBridgePid,
-      senderKeypair.publicKey, // payer
+      senderAddress, // payer
       wormholeMessagePda
     );
     let senderTokenAccount = getAssociatedTokenAddressSync(
       mint,
-      senderKeypair.publicKey // owner
+      senderAddress // owner
     );
 
     let method;
@@ -144,7 +138,7 @@ export class InstructionBuilder {
     const ix = method
       .accounts({
         generic: {
-          sender: senderKeypair.publicKey,
+          sender: senderAddress,
           mint,
           relayerVault: this.relayerVault,
           relayerRewardAccount: this.relayerRewardAccount,
@@ -159,19 +153,19 @@ export class InstructionBuilder {
   }
 
   public async pairAccountIx(
-    senderKeypair: Keypair,
+    senderAddress: PublicKey,
     userId: Buffer,
     userMessageNonce: bigint
   ): Promise<TransactionInstruction> {
     const wormholeMessagePda = deriveWormholeCoreMessageKey(
       this.spokeProgram.programId,
       userMessageNonce,
-      senderKeypair.publicKey
+      senderAddress
     );
     const wormholeAccounts = coreUtils.getPostMessageCpiAccounts(
       this.spokeProgram.programId,
       this.coreBridgePid,
-      senderKeypair.publicKey, // payer
+      senderAddress, // payer
       wormholeMessagePda
     );
 
@@ -180,7 +174,7 @@ export class InstructionBuilder {
       .methods.pairAccount(Array.from(userId))
       .accounts({
         generic: {
-          sender: senderKeypair.publicKey,
+          sender: senderAddress,
           relayerVault: this.relayerVault,
           relayerRewardAccount: this.relayerRewardAccount,
           // This account is ignored for account pairing (mint) but must be passed
