@@ -1,41 +1,39 @@
 import * as anchor from "@coral-xyz/anchor";
-import { AddressLookupTableAccount, AddressLookupTableProgram, ConfirmOptions, Keypair, PublicKey, Signer, TransactionInstruction, TransactionMessage, TransactionSignature, VersionedTransaction } from "@solana/web3.js";
+import { AddressLookupTableAccount, AddressLookupTableProgram, ConfirmOptions, PublicKey, sendAndConfirmRawTransaction, TransactionInstruction, TransactionMessage, TransactionSignature, VersionedTransaction } from "@solana/web3.js";
 import { WormholeLookupTableAccounts } from "./index";
 
-export async function createLookupTable(provider: anchor.AnchorProvider, payer: Keypair): Promise<PublicKey> {
+export async function createLookupTable(provider: anchor.AnchorProvider): Promise<PublicKey> {
   // we use this trick to avoid error like : "79 is not a recent slot"
   // another option is to use: getSlot("finalized");
   const slot = await provider.connection.getSlot() - 1;
 
   const [lookupTableInst, lookupTableAddress] =
     AddressLookupTableProgram.createLookupTable({
-      authority: payer.publicKey,
-      payer: payer.publicKey,
+      authority: provider.wallet.publicKey,
+      payer: provider.wallet.publicKey,
       recentSlot: slot,
     });
 
-  await sendTxWithConfirmation(provider, [payer], [lookupTableInst]);
+  await sendTxWithConfirmation(provider, [lookupTableInst]);
 
   return lookupTableAddress;
 }
 
 export async function extendLookupTable(
   provider: anchor.AnchorProvider,
-  payer: Keypair,
   lookupTableAddress: PublicKey,
   commonAccounts: WormholeLookupTableAccounts
 ) {
 
   const extendInstruction = AddressLookupTableProgram.extendLookupTable({
-    payer: payer.publicKey,
-    authority: payer.publicKey,
+    payer: provider.wallet.publicKey,
+    authority: provider.wallet.publicKey,
     lookupTable: lookupTableAddress,
     addresses: Object.values(commonAccounts).filter((key) => key !== undefined),
   });
 
   await sendTxWithConfirmation(
     provider,
-    [payer],
     [extendInstruction],
     undefined,
     // { commitment: "finalized" } // we could use this but to wait, but it takes too long
@@ -53,27 +51,24 @@ export async function extendLookupTable(
 }
 
 export function buildV0Transaction(
-  signers: Signer[],
+  signerPublicKey: PublicKey,
   instructions: TransactionInstruction[],
   latestBlockhash: string,
   addressLookupTableAccounts?: AddressLookupTableAccount[],
 ): VersionedTransaction {
 
   const messageV0 = new TransactionMessage({
-    payerKey: signers[0].publicKey,
+    payerKey: signerPublicKey,
     recentBlockhash: latestBlockhash,
     instructions
   }).compileToV0Message(addressLookupTableAccounts);
 
   const tx = new VersionedTransaction(messageV0);
-  tx.sign(signers);
   return tx;
 }
 
-
 export async function sendTxWithConfirmation(
   provider: anchor.AnchorProvider,
-  signers: Signer[],
   instructions: TransactionInstruction[],
   lookupTableAddress?: PublicKey,
   confirmOptions?: ConfirmOptions
@@ -81,7 +76,6 @@ export async function sendTxWithConfirmation(
 
   let latestBlockhashData = await provider.connection.getLatestBlockhash();
 
-  // let lookupTableAccounts: AddressLookupTableAccount[] | undefined = undefined;
   let lookupTableAccounts: AddressLookupTableAccount[] = [];
   if (lookupTableAddress != null) {
     const lookupTableAccount = await provider.connection
@@ -93,15 +87,23 @@ export async function sendTxWithConfirmation(
     lookupTableAccounts = [lookupTableAccount];
   }
 
-  const txV0 = buildV0Transaction(signers, instructions, latestBlockhashData.blockhash, lookupTableAccounts);
+  const txV0 = buildV0Transaction(provider.wallet.publicKey, instructions, latestBlockhashData.blockhash, lookupTableAccounts);
 
-  // will send tx and wait for confirmation with default confirmation level of the provider
-  const txSignature = await provider.sendAndConfirm(txV0, signers, {
-    // this is to get verbose error in anchor logs (can only be used in testing)  
-    skipPreflight: true,
-    // if commitment is not defined use default provider commitment (processed)
-    commitment: confirmOptions === undefined ? provider.opts.commitment : confirmOptions.commitment
-  });
+  // use wallet interface to sign the tx
+  const signedTx = await provider.wallet.signTransaction(txV0);
+
+  // if commitment is not defined use default "confirmed" commitment
+  const commitment = confirmOptions === undefined ? "confirmed" : confirmOptions.commitment!;
+
+  // will send tx and wait for confirmation
+  const txSignature = await sendAndConfirmRawTransaction(
+    provider.connection,
+    Buffer.from(signedTx.serialize()),
+    {
+      commitment: commitment,
+      preflightCommitment: commitment,
+    }
+  );
 
   return txSignature;
 }
