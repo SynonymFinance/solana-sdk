@@ -1,6 +1,6 @@
 {
   "name": "@0xkaes/solana-sdk",
-  "version": "0.0.8",
+  "version": "0.0.16",
   "description": "SYNO Finance Solana SDK.",
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",

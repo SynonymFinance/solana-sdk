@@ -8,7 +8,7 @@ import { ParsedVaa } from "../commons"
 import { contracts } from "@wormhole-foundation/sdk";
 import { PublicKey, TransactionSignature } from "@solana/web3.js";
 import { sendTxWithConfirmation } from "../commons/utils/lut";
-import { getNetworkFromRpcUrl } from "../../utils";
+import { getNetworkFromConnection, getNetworkFromRpcUrl } from "../../utils";
 import { deriveUserMessageNoncePda, getUserMessageNonceValue, HubActionType, toBN } from "../commons/utils";
 
 
@@ -27,20 +27,21 @@ export class SynonymSolanaClient {
   private coreBridgePid: PublicKey;
   private relayerVault: PublicKey;
   private relayerRewardAccount: PublicKey;
-  // private nodeWallet: NodeWallet;
+  private waitForConfirmation: boolean;
 
   constructor(
     anchorProvider: AnchorProvider,
     relayerVault: PublicKey,
     relayerRewardAccount: PublicKey,
+    solanaNetwork: SolanaNetwork,
+    waitForConfirmation: boolean
   ) {
     this.anchorProvider = anchorProvider;
     this.relayerVault = relayerVault;
     this.relayerRewardAccount = relayerRewardAccount;
+    this.waitForConfirmation = waitForConfirmation;
 
-    const wormholeContracts = SynonymSolanaClient.getWormholeContractsForSolanaNetwork(
-      this.getNetworkFromConnection()
-    );
+    const wormholeContracts = SynonymSolanaClient.getWormholeContractsForSolanaNetwork(solanaNetwork);
     this.coreBridgePid = new PublicKey(wormholeContracts.core);
 
     // In Anchor > 0.30 program address is already in IDL and we do not need to pass it separately
@@ -54,6 +55,22 @@ export class SynonymSolanaClient {
     this.accountFetcher = new AccountFetcher(this.spokeProgram);
   }
 
+  public static async newClient(
+    anchorProvider: AnchorProvider,
+    relayerVault: PublicKey,
+    relayerRewardAccount: PublicKey,
+    waitForConfirmation: boolean = true
+  ): Promise<SynonymSolanaClient> {
+    const solanaNetwork = await getNetworkFromConnection(anchorProvider.connection)
+    return new SynonymSolanaClient(
+      anchorProvider, 
+      relayerVault, 
+      relayerRewardAccount, 
+      solanaNetwork,
+      waitForConfirmation
+    );
+  }
+
   public async releaseFunds(deliveryInstructionVaa: ParsedVaa): Promise<TransactionSignature> {
     const releaseFundsIx = await this.instructionBuilder.buildReleaseFundsIx(
       deliveryInstructionVaa,
@@ -63,7 +80,8 @@ export class SynonymSolanaClient {
 
     const txSignature = sendTxWithConfirmation(
       this.anchorProvider,
-      [releaseFundsIx]
+      [releaseFundsIx],
+      this.waitForConfirmation
     );
 
     return txSignature;
@@ -144,7 +162,8 @@ export class SynonymSolanaClient {
 
     const txSignature = await sendTxWithConfirmation(
       this.anchorProvider,
-      [ix]
+      [ix],
+      this.waitForConfirmation
     );
 
 
@@ -171,7 +190,8 @@ export class SynonymSolanaClient {
 
     const txSignature = sendTxWithConfirmation(
       this.anchorProvider,
-      [outboundTransferIx]
+      [outboundTransferIx],
+      this.waitForConfirmation
     );
 
     return txSignature;
@@ -200,7 +220,8 @@ export class SynonymSolanaClient {
 
     const txSignature = sendTxWithConfirmation(
       this.anchorProvider,
-      [computeIx, inboundTransferIx]
+      [computeIx, inboundTransferIx],
+      this.waitForConfirmation
     );
 
     return txSignature;
@@ -225,7 +246,8 @@ export class SynonymSolanaClient {
 
     const txSignature = sendTxWithConfirmation(
       this.anchorProvider,
-      [computeIx, inboundTransferIx]
+      [computeIx, inboundTransferIx],
+      this.waitForConfirmation
     );
 
     return txSignature;

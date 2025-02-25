@@ -17,6 +17,19 @@ export function getNetworkFromRpcUrl(rpcUrl: string): SolanaNetwork {
   throw Error(`Unable to find network type for ${rpcUrl}`);
 }
 
+export async function getNetworkFromConnection(connection: Connection): Promise<SolanaNetwork> {
+  const genesisHash = await connection.getGenesisHash();
+  console.log("genesis hash: ", genesisHash);
+  if (genesisHash === "EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG") {
+    return SolanaNetwork.DEVNET
+  } else if (genesisHash === "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d") {
+    return SolanaNetwork.MAINNET
+  } 
+  
+  // if no match it is an error
+  throw Error(`Unable to find network type for ${connection.rpcEndpoint}`);
+}
+
 export function createAnchorProvider(connection: Connection, keypair: Keypair): anchor.AnchorProvider {
   return new anchor.AnchorProvider(
     connection,
