@@ -1,5 +1,5 @@
 import * as anchor from "@coral-xyz/anchor";
-import { AddressLookupTableAccount, AddressLookupTableProgram, ConfirmOptions, PublicKey, sendAndConfirmRawTransaction, TransactionInstruction, TransactionMessage, TransactionSignature, VersionedTransaction } from "@solana/web3.js";
+import { AddressLookupTableAccount, AddressLookupTableProgram, ConfirmOptions, PublicKey, TransactionInstruction, TransactionMessage, TransactionSignature, VersionedTransaction } from "@solana/web3.js";
 import { WormholeLookupTableAccounts } from "./index";
 
 export async function createLookupTable(provider: anchor.AnchorProvider): Promise<PublicKey> {
@@ -14,7 +14,7 @@ export async function createLookupTable(provider: anchor.AnchorProvider): Promis
       recentSlot: slot,
     });
 
-  await sendTxWithConfirmation(provider, [lookupTableInst]);
+  await sendTxWithConfirmation(provider, [lookupTableInst], true);
 
   return lookupTableAddress;
 }
@@ -35,6 +35,7 @@ export async function extendLookupTable(
   await sendTxWithConfirmation(
     provider,
     [extendInstruction],
+    true,
     undefined,
     // { commitment: "finalized" } // we could use this but to wait, but it takes too long
   );
@@ -70,8 +71,9 @@ export function buildV0Transaction(
 export async function sendTxWithConfirmation(
   provider: anchor.AnchorProvider,
   instructions: TransactionInstruction[],
+  waitForConfirmation: boolean,
   lookupTableAddress?: PublicKey,
-  confirmOptions?: ConfirmOptions
+  confirmOptions?: ConfirmOptions,
 ): Promise<TransactionSignature> {
 
   let latestBlockhashData = await provider.connection.getLatestBlockhash();
@@ -95,15 +97,31 @@ export async function sendTxWithConfirmation(
   // if commitment is not defined use default "confirmed" commitment
   const commitment = confirmOptions === undefined ? "confirmed" : confirmOptions.commitment!;
 
-  // will send tx and wait for confirmation
-  const txSignature = await sendAndConfirmRawTransaction(
-    provider.connection,
+  // Fetch the latest blockhash and last valid block height
+  const latestBlockhash = await provider.connection.getLatestBlockhash();
+
+  const txSignature = await provider.connection.sendRawTransaction(
     Buffer.from(signedTx.serialize()),
     {
-      commitment: commitment,
       preflightCommitment: commitment,
     }
   );
+
+  console.log("Tx sent: ", txSignature);
+
+  if(waitForConfirmation) {
+    // Define the confirmation strategy
+    const confirmationStrategy = {
+      signature: txSignature,
+      blockhash: latestBlockhash.blockhash,
+      lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+    };
+
+    // await provider.connection.confirmTransaction(txSignature, commitment);
+    await provider.connection.confirmTransaction(confirmationStrategy, commitment);  
+  }
+
+  
 
   return txSignature;
 }
