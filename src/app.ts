@@ -63,6 +63,12 @@ async function main() {
   );
   console.log("Pair account check - OK");
 
+  const oneWayTripCostDelivery = await spokeClient.getOneWayTripCostDelivery();
+  const roundTripCostDelivery = await spokeClient.getRoundTripCostDelivery();
+
+  console.log("One way trip cost delivery (SOL) : ", oneWayTripCostDelivery);
+  console.log("Round trip cost delivery (SOL) : ", roundTripCostDelivery);
+
   // There is no simple test like above for releaseFunds() because this instruction needs a has of VAA which is posted on chain
 
 }
