@@ -5,7 +5,7 @@
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
   "engines": {
-    "node": "21.x"
+    "node": "18.x"
   },
   "scripts": {
     "start-test": "tsx src/app.ts",
