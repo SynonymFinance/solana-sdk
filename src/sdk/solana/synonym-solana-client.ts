@@ -5,7 +5,7 @@ import { solanaSpokeIdl } from "../../ts-types/solana";
 import { InstructionBuilder } from "./instruction-builder";
 import { AccountFetcher } from "./account-fetcher";
 import { CONTRACTS, ParsedVaa } from "@certusone/wormhole-sdk";
-import { PublicKey, TransactionSignature } from "@solana/web3.js";
+import { LAMPORTS_PER_SOL, PublicKey, TransactionSignature } from "@solana/web3.js";
 import { sendTxWithConfirmation } from "../commons/utils/lut";
 import { getNetworkFromConnection, getNetworkFromRpcUrl } from "../../utils";
 import { deriveUserMessageNoncePda, getUserMessageNonceValue, HubActionType, toBN } from "../commons/utils";
@@ -167,6 +167,28 @@ export class SynonymSolanaClient {
 
 
     return [txSignature, deliveryPriceConfig.hubTxCostSol];
+  }
+
+  /*** Config getter ***/
+
+  public async getOneWayTripCostDelivery(): Promise<string> {
+    const deliveryPriceConfig = await this.accountFetcher.fetchDeliveryPriceConfig();
+
+    const cost = deliveryPriceConfig.hubTxCostSol;
+    const result = Number(cost) / Number(LAMPORTS_PER_SOL);
+
+    return result.toString();
+  }
+
+  public async getRoundTripCostDelivery(): Promise<string> {
+    const deliveryPriceConfig = await this.accountFetcher.fetchDeliveryPriceConfig();
+
+    const hubTxCost = deliveryPriceConfig.hubTxCostSol;
+    const returnSolanaTxConst = deliveryPriceConfig.spokeReleaseFundsTxCostSol;
+    const totalCost = hubTxCost.add(returnSolanaTxConst).toNumber()
+    const result = totalCost / Number(LAMPORTS_PER_SOL);
+
+    return result.toString();
   }
 
   /*** Tx builder ***/

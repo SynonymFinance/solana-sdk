@@ -107,8 +107,6 @@ export async function sendTxWithConfirmation(
     }
   );
 
-  console.log("Tx sent: ", txSignature);
-
   if(waitForConfirmation) {
     // Define the confirmation strategy
     const confirmationStrategy = {
@@ -120,8 +118,6 @@ export async function sendTxWithConfirmation(
     // await provider.connection.confirmTransaction(txSignature, commitment);
     await provider.connection.confirmTransaction(confirmationStrategy, commitment);  
   }
-
-  
 
   return txSignature;
 }
