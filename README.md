@@ -55,6 +55,13 @@ If specific commit hash is required:
 2. Update the `"version"` field according to [Semantic Versioning](https://semver.org/):
    - `MAJOR.MINOR.PATCH` (e.g., change from `1.0.0` to `1.1.0` or `1.0.1`).
 
+## **Step 2: Login to npm repository
+```
+yarn login --scope synofinance 
+```
+You will be asked to provide username and email used during registration.
+
+Later when running `yarn publish --access public` you will be asked for password.
 
 ## **Step 2: Build the Package**
 Run the following command to build the package:
