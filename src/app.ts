@@ -22,7 +22,7 @@ async function main() {
 
   console.log("anchor provider wallet: ", anchorProvider.wallet);
 
-  const spokeClient = await SynonymSolanaClient.newClient(
+  const spokeClient = await SynonymSolanaClient.new(
     anchorProvider,
     // testAnchorProvider,
     solanaKeypair.publicKey,
