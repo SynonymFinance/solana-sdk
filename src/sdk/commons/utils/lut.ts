@@ -108,14 +108,12 @@ export async function sendTxWithConfirmation(
   );
 
   if(waitForConfirmation) {
-    // Define the confirmation strategy
     const confirmationStrategy = {
       signature: txSignature,
       blockhash: latestBlockhash.blockhash,
       lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
     };
 
-    // await provider.connection.confirmTransaction(txSignature, commitment);
     await provider.connection.confirmTransaction(confirmationStrategy, commitment);  
   }
 
