@@ -55,7 +55,7 @@ export class SynonymSolanaClient {
     this.accountFetcher = new AccountFetcher(this.spokeProgram);
   }
 
-  public static async newClient(
+  public static async new(
     anchorProvider: AnchorProvider,
     relayerVault: PublicKey,
     relayerRewardAccount: PublicKey,
