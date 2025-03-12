@@ -19,7 +19,6 @@ export function getNetworkFromRpcUrl(rpcUrl: string): SolanaNetwork {
 
 export async function getNetworkFromConnection(connection: Connection): Promise<SolanaNetwork> {
   const genesisHash = await connection.getGenesisHash();
-  console.log("genesis hash: ", genesisHash);
   if (genesisHash === "EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG") {
     return SolanaNetwork.DEVNET
   } else if (genesisHash === "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d") {
