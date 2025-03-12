@@ -5,7 +5,7 @@ import { solanaSpokeIdl } from "../../ts-types/solana";
 import { InstructionBuilder } from "./instruction-builder";
 import { AccountFetcher } from "./account-fetcher";
 import { CONTRACTS, ParsedVaa } from "@certusone/wormhole-sdk";
-import { LAMPORTS_PER_SOL, PublicKey, TransactionSignature } from "@solana/web3.js";
+import { PublicKey, TransactionSignature } from "@solana/web3.js";
 import { sendTxWithConfirmation } from "../commons/utils/lut";
 import { getNetworkFromConnection, getNetworkFromRpcUrl } from "../../utils";
 import { deriveUserMessageNoncePda, getUserMessageNonceValue, HubActionType, toBigInt, toBN } from "../commons/utils";
