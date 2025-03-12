@@ -43,7 +43,7 @@ If specific commit hash is required:
 "solana-sdk": "git+https://github.com/SynonymFinance/solana-sdk#0e01163c0e046c9253c3a976bf6f28e338010091"
 ```
 
-# **Releasing a New Version of the Package**
+# **Releasing a New Version of the Package. NOTE : ONLY FOR ETHERS-V6** 
 
 ## Prerequisites
 1. You must have an NPM account. (https://www.npmjs.com/)
