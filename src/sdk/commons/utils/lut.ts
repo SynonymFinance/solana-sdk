@@ -76,7 +76,7 @@ export async function sendTxWithConfirmation(
   confirmOptions?: ConfirmOptions,
 ): Promise<TransactionSignature> {
 
-  let latestBlockhashData = await provider.connection.getLatestBlockhash();
+  let latestBlockhash = await provider.connection.getLatestBlockhash();
 
   let lookupTableAccounts: AddressLookupTableAccount[] = [];
   if (lookupTableAddress != null) {
@@ -89,7 +89,7 @@ export async function sendTxWithConfirmation(
     lookupTableAccounts = [lookupTableAccount];
   }
 
-  const txV0 = buildV0Transaction(provider.wallet.publicKey, instructions, latestBlockhashData.blockhash, lookupTableAccounts);
+  const txV0 = buildV0Transaction(provider.wallet.publicKey, instructions, latestBlockhash.blockhash, lookupTableAccounts);
 
   // use wallet interface to sign the tx
   const signedTx = await provider.wallet.signTransaction(txV0);
@@ -98,7 +98,6 @@ export async function sendTxWithConfirmation(
   const commitment = confirmOptions === undefined ? "confirmed" : confirmOptions.commitment!;
 
   // Fetch the latest blockhash and last valid block height
-  const latestBlockhash = await provider.connection.getLatestBlockhash();
 
   const txSignature = await provider.connection.sendRawTransaction(
     Buffer.from(signedTx.serialize()),

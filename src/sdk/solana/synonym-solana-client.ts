@@ -170,6 +170,14 @@ export class SynonymSolanaClient {
     return [txSignature, deliveryPriceConfig.hubTxCostSol];
   }
 
+  // public static async getOneWayTripCostDelivery(anchorProvider: AnchorProvider): Promise<bigint> {
+  //   const spokeProgram = new Program(solanaSpokeIdl as SolanaSpoke, anchorProvider);
+  //   const accountFetcher = new AccountFetcher(spokeProgram);
+  //   const deliveryPriceConfig = await accountFetcher.fetchDeliveryPriceConfig();
+
+  //   return toBigInt(deliveryPriceConfig.hubTxCostSol);
+  // }
+
   /*** Config getters ***/
 
   public async getOneWayTripCostDelivery(): Promise<bigint> {
