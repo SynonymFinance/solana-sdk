@@ -1,6 +1,7 @@
 import * as anchor from "@coral-xyz/anchor";
 import { AnchorProvider, Program } from "@coral-xyz/anchor";
-import { SolanaSpoke } from "../../ts-types/solana/solana_spoke";
+import { SolanaSpoke as SolanaSpokeDevnet } from "../../ts-types/solana/solana_spoke_devnet";
+import { SolanaSpoke as SolanaSpokeMainnet } from "../../ts-types/solana/solana_spoke_mainnet";
 import { solanaSpokeIdl } from "../../ts-types/solana";
 import { InstructionBuilder } from "./instruction-builder";
 import { AccountFetcher } from "./account-fetcher";
@@ -22,7 +23,8 @@ export class SynonymSolanaClient {
   public accountFetcher: AccountFetcher;
 
   private anchorProvider: AnchorProvider;
-  private spokeProgram: Program<SolanaSpoke>;
+  private spokeProgramDevnet: Program<SolanaSpokeDevnet>;
+  private spokeProgramMainnet: Program<SolanaSpokeMainnet>;
   private instructionBuilder: InstructionBuilder;
   private coreBridgePid: PublicKey;
   private relayerVault: PublicKey;
@@ -45,14 +47,16 @@ export class SynonymSolanaClient {
     this.coreBridgePid = new PublicKey(wormholeContracts.core);
 
     // In Anchor > 0.30 program address is already in IDL and we do not need to pass it separately
-    this.spokeProgram = new Program(solanaSpokeIdl as SolanaSpoke, anchorProvider);
+    this.spokeProgramDevnet = new Program(solanaSpokeIdl as SolanaSpokeDevnet, anchorProvider);
+    this.spokeProgramMainnet = new Program(solanaSpokeIdl as SolanaSpokeMainnet , anchorProvider);
     this.instructionBuilder = new InstructionBuilder(
-      this.spokeProgram,
+      this.spokeProgramDevnet,
+      this.spokeProgramMainnet,
       this.relayerVault,
       this.relayerRewardAccount,
       this.coreBridgePid
     );
-    this.accountFetcher = new AccountFetcher(this.spokeProgram);
+    this.accountFetcher = new AccountFetcher(this.spokeProgramDevnet, this.spokeProgramMainnet);
   }
 
   public static async new(
@@ -149,7 +153,7 @@ export class SynonymSolanaClient {
   public async updateDeliveryPrice(hubTxCostSol: bigint): Promise<[string, anchor.BN]> {
     const deliveryPriceConfig = await this.accountFetcher.fetchDeliveryPriceConfig();
 
-    const ix = await this.spokeProgram.methods
+    const ix = await this.spokeProgramDevnet.methods
       .updateDeliveryPrice(
         deliveryPriceConfig.spokeReleaseFundsTxCostSol,
         toBN(hubTxCostSol),
@@ -203,7 +207,7 @@ export class SynonymSolanaClient {
     mint: PublicKey,
     amount: anchor.BN
   ): Promise<TransactionSignature> {
-    const userMessageNoncePda = deriveUserMessageNoncePda(this.spokeProgram.programId, this.anchorProvider.wallet.publicKey);
+    const userMessageNoncePda = deriveUserMessageNoncePda(this.getSpokeProgramId(), this.anchorProvider.wallet.publicKey);
     let userMessageNonce = await getUserMessageNonceValue(this.anchorProvider.connection, userMessageNoncePda);
 
     const outboundTransferIx = await this.instructionBuilder.buildOutboundTransferIx(
@@ -228,7 +232,7 @@ export class SynonymSolanaClient {
     mint: PublicKey,
     amount: anchor.BN,
   ): Promise<TransactionSignature> {
-    const userMessageNoncePda = deriveUserMessageNoncePda(this.spokeProgram.programId, this.anchorProvider.wallet.publicKey);
+    const userMessageNoncePda = deriveUserMessageNoncePda(this.getSpokeProgramId(), this.anchorProvider.wallet.publicKey);
     let userMessageNonce = await getUserMessageNonceValue(this.anchorProvider.connection, userMessageNoncePda);
 
     const inboundTransferIx = await this.instructionBuilder.buildInboundTransferIx(
@@ -239,9 +243,8 @@ export class SynonymSolanaClient {
       userMessageNonce
     );
 
-    // This tx consumes smaller amount of gas, we decrease it to 150k CU (base is 200K)
     const computeIx = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({
-      units: 150_000,
+      units: 210_000,
     });
 
     const txSignature = sendTxWithConfirmation(
@@ -256,7 +259,7 @@ export class SynonymSolanaClient {
   async pairAccountTx(
     userId: Buffer
   ): Promise<TransactionSignature> {
-    const userMessageNoncePda = deriveUserMessageNoncePda(this.spokeProgram.programId, this.anchorProvider.wallet.publicKey);
+    const userMessageNoncePda = deriveUserMessageNoncePda(this.getSpokeProgramId(), this.anchorProvider.wallet.publicKey);
     let userMessageNonce = await getUserMessageNonceValue(this.anchorProvider.connection, userMessageNoncePda);
 
     const inboundTransferIx = await this.instructionBuilder.pairAccountIx(
@@ -299,6 +302,17 @@ export class SynonymSolanaClient {
 
   getNetworkFromConnection(): SolanaNetwork {
     return getNetworkFromRpcUrl(this.anchorProvider.connection.rpcEndpoint);
+  }
+
+  getSpokeProgramId(): PublicKey {
+    const network = process.env.SOLANA_NETWORK;
+    if(network === "MAINNET") {
+      return this.spokeProgramMainnet.programId;
+    } else if (network === "DEVNET") {
+      return this.spokeProgramDevnet.programId;
+    } else {
+      throw new Error("Unknown network environment for IDL loading: " + network);
+    }
   }
 
 }

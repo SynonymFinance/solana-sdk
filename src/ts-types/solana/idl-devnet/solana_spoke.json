@@ -166,11 +166,17 @@
             },
             {
               "name": "relayer_vault",
-              "writable": true
+              "writable": true,
+              "relations": [
+                "base_config"
+              ]
             },
             {
               "name": "relayer_reward_account",
-              "writable": true
+              "writable": true,
+              "relations": [
+                "base_config"
+              ]
             },
             {
               "name": "mint",
@@ -457,6 +463,10 @@
             {
               "name": "system_program",
               "address": "11111111111111111111111111111111"
+            },
+            {
+              "name": "token_program",
+              "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
             },
             {
               "name": "associated_token_program",
@@ -595,11 +605,17 @@
             },
             {
               "name": "relayer_vault",
-              "writable": true
+              "writable": true,
+              "relations": [
+                "base_config"
+              ]
             },
             {
               "name": "relayer_reward_account",
-              "writable": true
+              "writable": true,
+              "relations": [
+                "base_config"
+              ]
             },
             {
               "name": "mint",
@@ -888,6 +904,10 @@
               "address": "11111111111111111111111111111111"
             },
             {
+              "name": "token_program",
+              "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+            },
+            {
               "name": "associated_token_program",
               "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
             },
@@ -996,6 +1016,14 @@
         {
           "name": "token_program",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
@@ -1048,31 +1076,6 @@
           }
         },
         {
-          "name": "custom_wormhole_emitter",
-          "docs": [
-            "If we would use `init` we could blow up the stack (we are already creating like that other pda accounts)",
-            "Anchor is not memory efficient with using `init` to create accounts.",
-            "issue: https://github.com/anza-xyz/agave/issues/1186"
-          ],
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  101,
-                  109,
-                  105,
-                  116,
-                  116,
-                  101,
-                  114
-                ]
-              }
-            ]
-          }
-        },
-        {
           "name": "delivery_price_config",
           "writable": true,
           "pda": {
@@ -1119,34 +1122,6 @@
                   117,
                   108,
                   116,
-                  95,
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "reserves_config",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  114,
-                  101,
-                  115,
-                  101,
-                  114,
-                  118,
-                  101,
-                  115,
                   95,
                   99,
                   111,
@@ -1286,11 +1261,17 @@
             },
             {
               "name": "relayer_vault",
-              "writable": true
+              "writable": true,
+              "relations": [
+                "base_config"
+              ]
             },
             {
               "name": "relayer_reward_account",
-              "writable": true
+              "writable": true,
+              "relations": [
+                "base_config"
+              ]
             },
             {
               "name": "mint",
@@ -1579,6 +1560,10 @@
               "address": "11111111111111111111111111111111"
             },
             {
+              "name": "token_program",
+              "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+            },
+            {
               "name": "associated_token_program",
               "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
             },
@@ -1620,7 +1605,10 @@
       "accounts": [
         {
           "name": "owner",
-          "signer": true
+          "signer": true,
+          "relations": [
+            "base_config"
+          ]
         },
         {
           "name": "base_config",
@@ -1650,6 +1638,294 @@
       "args": []
     },
     {
+      "name": "refund_failed_deposit",
+      "docs": [
+        "This function can be only called by an owner in case user deposit fails on Hub side (Hub Tx reverts)",
+        "and therefore was not correctly accounted. In such case we need to manually refund user.",
+        "",
+        "# Arguments",
+        "* `ctx` - accounts associated with this instruction",
+        "* amount - amount to refund"
+      ],
+      "discriminator": [
+        1,
+        151,
+        141,
+        175,
+        52,
+        83,
+        183,
+        94
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "signer": true,
+          "relations": [
+            "base_config"
+          ]
+        },
+        {
+          "name": "base_config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  115,
+                  101,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "docs": [
+            "Mint for token that will be refunded"
+          ]
+        },
+        {
+          "name": "vault_config",
+          "docs": [
+            "Needs to be mut in case we need to refund SOL (which is stored directly on the account)"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "vault_config"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "refund_wallet",
+          "writable": true
+        },
+        {
+          "name": "refund_token_account",
+          "docs": [
+            "Token account for refund wallet (an SPL token)"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "refund_wallet"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "release_funds",
       "docs": [
         "This function will release funds to user.",
@@ -1671,9 +1947,12 @@
       ],
       "accounts": [
         {
-          "name": "relayer",
+          "name": "relayer_account",
           "writable": true,
-          "signer": true
+          "signer": true,
+          "relations": [
+            "base_config"
+          ]
         },
         {
           "name": "base_config",
@@ -2134,11 +2413,17 @@
             },
             {
               "name": "relayer_vault",
-              "writable": true
+              "writable": true,
+              "relations": [
+                "base_config"
+              ]
             },
             {
               "name": "relayer_reward_account",
-              "writable": true
+              "writable": true,
+              "relations": [
+                "base_config"
+              ]
             },
             {
               "name": "mint",
@@ -2427,6 +2712,10 @@
               "address": "11111111111111111111111111111111"
             },
             {
+              "name": "token_program",
+              "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+            },
+            {
               "name": "associated_token_program",
               "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
             },
@@ -2535,6 +2824,14 @@
         {
           "name": "token_program",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
@@ -2610,7 +2907,10 @@
       "accounts": [
         {
           "name": "owner",
-          "signer": true
+          "signer": true,
+          "relations": [
+            "base_config"
+          ]
         },
         {
           "name": "base_config",
@@ -2654,7 +2954,10 @@
       "accounts": [
         {
           "name": "owner",
-          "signer": true
+          "signer": true,
+          "relations": [
+            "base_config"
+          ]
         },
         {
           "name": "base_config",
@@ -2693,74 +2996,6 @@
       ]
     },
     {
-      "name": "update_custom_wormhole_emitter",
-      "discriminator": [
-        99,
-        230,
-        123,
-        71,
-        62,
-        241,
-        48,
-        237
-      ],
-      "accounts": [
-        {
-          "name": "owner",
-          "signer": true
-        },
-        {
-          "name": "base_config",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  98,
-                  97,
-                  115,
-                  101,
-                  95,
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "custom_wormhole_emitter",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  101,
-                  109,
-                  105,
-                  116,
-                  116,
-                  101,
-                  114
-                ]
-              }
-            ]
-          }
-        }
-      ],
-      "args": [
-        {
-          "name": "finality",
-          "type": "u8"
-        }
-      ]
-    },
-    {
       "name": "update_delivery_price",
       "discriminator": [
         92,
@@ -2775,7 +3010,10 @@
       "accounts": [
         {
           "name": "price_keeper",
-          "signer": true
+          "signer": true,
+          "relations": [
+            "base_config"
+          ]
         },
         {
           "name": "base_config",
@@ -2869,7 +3107,10 @@
       "accounts": [
         {
           "name": "owner",
-          "signer": true
+          "signer": true,
+          "relations": [
+            "base_config"
+          ]
         },
         {
           "name": "base_config",
@@ -3032,11 +3273,17 @@
             },
             {
               "name": "relayer_vault",
-              "writable": true
+              "writable": true,
+              "relations": [
+                "base_config"
+              ]
             },
             {
               "name": "relayer_reward_account",
-              "writable": true
+              "writable": true,
+              "relations": [
+                "base_config"
+              ]
             },
             {
               "name": "mint",
@@ -3325,6 +3572,10 @@
               "address": "11111111111111111111111111111111"
             },
             {
+              "name": "token_program",
+              "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+            },
+            {
               "name": "associated_token_program",
               "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
             },
@@ -3372,19 +3623,6 @@
         71,
         35,
         174
-      ]
-    },
-    {
-      "name": "CustomWormholeEmitter",
-      "discriminator": [
-        193,
-        34,
-        146,
-        181,
-        26,
-        60,
-        76,
-        7
       ]
     },
     {
@@ -3437,6 +3675,60 @@
         102,
         119,
         77
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "InboundTransferEvent",
+      "discriminator": [
+        159,
+        22,
+        11,
+        137,
+        245,
+        76,
+        49,
+        204
+      ]
+    },
+    {
+      "name": "OutboundTransferEvent",
+      "discriminator": [
+        225,
+        253,
+        33,
+        134,
+        245,
+        43,
+        48,
+        116
+      ]
+    },
+    {
+      "name": "PairingAccountEvent",
+      "discriminator": [
+        119,
+        178,
+        238,
+        32,
+        189,
+        237,
+        43,
+        158
+      ]
+    },
+    {
+      "name": "ReleaseFundsEvent",
+      "discriminator": [
+        156,
+        241,
+        58,
+        41,
+        202,
+        170,
+        124,
+        59
       ]
     }
   ],
@@ -3695,6 +3987,21 @@
       "code": 6050,
       "name": "ZeroUserAccount",
       "msg": "User account can not be 0x0"
+    },
+    {
+      "code": 6051,
+      "name": "PdaAccountAlreadyInitialized",
+      "msg": "PDA account already initialized"
+    },
+    {
+      "code": 6052,
+      "name": "InvalidEvmTargetSelector",
+      "msg": "Invalid Evm target selector"
+    },
+    {
+      "code": 6053,
+      "name": "InvalidFinality",
+      "msg": "Invalid finality"
     }
   ],
   "types": [
@@ -3794,6 +4101,10 @@
               "Account EOA that can update delivery prices"
             ],
             "type": "pubkey"
+          },
+          {
+            "name": "finality",
+            "type": "u8"
           }
         ]
       }
@@ -3861,6 +4172,10 @@
           {
             "name": "price_keeper",
             "type": "pubkey"
+          },
+          {
+            "name": "finality",
+            "type": "u8"
           }
         ]
       }
@@ -3920,6 +4235,12 @@
             "name": "price_keeper",
             "type": {
               "option": "pubkey"
+            }
+          },
+          {
+            "name": "finality",
+            "type": {
+              "option": "u8"
             }
           }
         ]
@@ -3983,27 +4304,6 @@
       }
     },
     {
-      "name": "CustomWormholeEmitter",
-      "docs": [
-        "This is the pda account that we need for Wormhole Core Bridge",
-        "It wil be used as emitter account during sending messages with raw core bridge (without token_bridge)",
-        "It does not need to have any data"
-      ],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "finality",
-            "type": {
-              "defined": {
-                "name": "Finality"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
       "name": "DeliveryPriceConfig",
       "docs": [
         "Delivery Price Config",
@@ -4047,15 +4347,106 @@
       }
     },
     {
-      "name": "Finality",
+      "name": "InboundTransferEvent",
       "type": {
-        "kind": "enum",
-        "variants": [
+        "kind": "struct",
+        "fields": [
           {
-            "name": "Confirmed"
+            "name": "action_type",
+            "type": "u8"
           },
           {
-            "name": "Finalized"
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "nonce",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OutboundTransferEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "action_type",
+            "type": "u8"
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "nonce",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PairingAccountEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "new_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "user_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "nonce",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ReleaseFundsEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "nonce",
+            "type": "u64"
           }
         ]
       }
@@ -4088,7 +4479,8 @@
     {
       "name": "VaultConfig",
       "docs": [
-        "Vault config pda account is used as owner for ATA accounts of tokens deposited to into Spoke"
+        "Vault config pda account is used as owner for ATA accounts of tokens deposited to into Spoke.",
+        "This account is also vault for SOL so it must be initialized."
       ],
       "type": {
         "kind": "struct",

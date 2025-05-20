@@ -1,9 +1,11 @@
 import { createAnchorProvider, createSolanaConnection, createSolanaKeypair, getNetworkFromRpcUrl } from "./utils";
-import { SOLANA_RELAYER_EOA, SOLANA_RELAYER_REWARD, SOLANA_RPC } from "./consts";
+import { SOLANA_RELAYER_EOA, SOLANA_RELAYER_REWARD, SOLANA_RELAYER_VAULT, SOLANA_RPC } from "./consts";
 import { SynonymSolanaClient } from "./sdk/solana/synonym-solana-client";
 import { NATIVE_MINT } from "@solana/spl-token";
 import * as assert from "assert";
 import { PublicKey } from "@solana/web3.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 async function main() {  
   const solanaConnection = createSolanaConnection(SOLANA_RPC);
@@ -25,8 +27,7 @@ async function main() {
 
   const spokeClient = await SynonymSolanaClient.new(
     anchorProvider,
-    // testAnchorProvider,
-    solanaKeypair.publicKey,
+    SOLANA_RELAYER_VAULT,
     SOLANA_RELAYER_REWARD
   );
 

@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/solana_spoke.json`.
  */
 export type SolanaSpoke = {
-  "address": "Xaccm6FSksvhANYRnk8yF7hsTfJFzgrXwAbQ18K2ipK",
+  "address": "syno2CN6vquP39U9UfewmSPm6QKaR1rvrEViLoU2FY8",
   "metadata": {
     "name": "solanaSpoke",
     "version": "0.1.0",
@@ -172,11 +172,17 @@ export type SolanaSpoke = {
             },
             {
               "name": "relayerVault",
-              "writable": true
+              "writable": true,
+              "relations": [
+                "baseConfig"
+              ]
             },
             {
               "name": "relayerRewardAccount",
-              "writable": true
+              "writable": true,
+              "relations": [
+                "baseConfig"
+              ]
             },
             {
               "name": "mint",
@@ -458,11 +464,15 @@ export type SolanaSpoke = {
             },
             {
               "name": "wormholeProgram",
-              "address": "3u8hJUVTA4jH1wYAyUur7FFZVQ8H635K3tSHHF4ssjQ5"
+              "address": "worm2ZoG2kUd4vFXhvjh93UUH596ayRfgQ2MgjNMTth"
             },
             {
               "name": "systemProgram",
               "address": "11111111111111111111111111111111"
+            },
+            {
+              "name": "tokenProgram",
+              "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
             },
             {
               "name": "associatedTokenProgram",
@@ -601,11 +611,17 @@ export type SolanaSpoke = {
             },
             {
               "name": "relayerVault",
-              "writable": true
+              "writable": true,
+              "relations": [
+                "baseConfig"
+              ]
             },
             {
               "name": "relayerRewardAccount",
-              "writable": true
+              "writable": true,
+              "relations": [
+                "baseConfig"
+              ]
             },
             {
               "name": "mint",
@@ -887,11 +903,15 @@ export type SolanaSpoke = {
             },
             {
               "name": "wormholeProgram",
-              "address": "3u8hJUVTA4jH1wYAyUur7FFZVQ8H635K3tSHHF4ssjQ5"
+              "address": "worm2ZoG2kUd4vFXhvjh93UUH596ayRfgQ2MgjNMTth"
             },
             {
               "name": "systemProgram",
               "address": "11111111111111111111111111111111"
+            },
+            {
+              "name": "tokenProgram",
+              "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
             },
             {
               "name": "associatedTokenProgram",
@@ -1002,6 +1022,14 @@ export type SolanaSpoke = {
         {
           "name": "tokenProgram",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associatedTokenProgram",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
@@ -1054,31 +1082,6 @@ export type SolanaSpoke = {
           }
         },
         {
-          "name": "customWormholeEmitter",
-          "docs": [
-            "If we would use `init` we could blow up the stack (we are already creating like that other pda accounts)",
-            "Anchor is not memory efficient with using `init` to create accounts.",
-            "issue: https://github.com/anza-xyz/agave/issues/1186"
-          ],
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  101,
-                  109,
-                  105,
-                  116,
-                  116,
-                  101,
-                  114
-                ]
-              }
-            ]
-          }
-        },
-        {
           "name": "deliveryPriceConfig",
           "writable": true,
           "pda": {
@@ -1125,34 +1128,6 @@ export type SolanaSpoke = {
                   117,
                   108,
                   116,
-                  95,
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "reservesConfig",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  114,
-                  101,
-                  115,
-                  101,
-                  114,
-                  118,
-                  101,
-                  115,
                   95,
                   99,
                   111,
@@ -1292,11 +1267,17 @@ export type SolanaSpoke = {
             },
             {
               "name": "relayerVault",
-              "writable": true
+              "writable": true,
+              "relations": [
+                "baseConfig"
+              ]
             },
             {
               "name": "relayerRewardAccount",
-              "writable": true
+              "writable": true,
+              "relations": [
+                "baseConfig"
+              ]
             },
             {
               "name": "mint",
@@ -1578,11 +1559,15 @@ export type SolanaSpoke = {
             },
             {
               "name": "wormholeProgram",
-              "address": "3u8hJUVTA4jH1wYAyUur7FFZVQ8H635K3tSHHF4ssjQ5"
+              "address": "worm2ZoG2kUd4vFXhvjh93UUH596ayRfgQ2MgjNMTth"
             },
             {
               "name": "systemProgram",
               "address": "11111111111111111111111111111111"
+            },
+            {
+              "name": "tokenProgram",
+              "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
             },
             {
               "name": "associatedTokenProgram",
@@ -1626,7 +1611,10 @@ export type SolanaSpoke = {
       "accounts": [
         {
           "name": "owner",
-          "signer": true
+          "signer": true,
+          "relations": [
+            "baseConfig"
+          ]
         },
         {
           "name": "baseConfig",
@@ -1656,6 +1644,294 @@ export type SolanaSpoke = {
       "args": []
     },
     {
+      "name": "refundFailedDeposit",
+      "docs": [
+        "This function can be only called by an owner in case user deposit fails on Hub side (Hub Tx reverts)",
+        "and therefore was not correctly accounted. In such case we need to manually refund user.",
+        "",
+        "# Arguments",
+        "* `ctx` - accounts associated with this instruction",
+        "* amount - amount to refund"
+      ],
+      "discriminator": [
+        1,
+        151,
+        141,
+        175,
+        52,
+        83,
+        183,
+        94
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "signer": true,
+          "relations": [
+            "baseConfig"
+          ]
+        },
+        {
+          "name": "baseConfig",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  115,
+                  101,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "docs": [
+            "Mint for token that will be refunded"
+          ]
+        },
+        {
+          "name": "vaultConfig",
+          "docs": [
+            "Needs to be mut in case we need to refund SOL (which is stored directly on the account)"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "vaultTokenAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "vaultConfig"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "refundWallet",
+          "writable": true
+        },
+        {
+          "name": "refundTokenAccount",
+          "docs": [
+            "Token account for refund wallet (an SPL token)"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "refundWallet"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "releaseFunds",
       "docs": [
         "This function will release funds to user.",
@@ -1677,9 +1953,12 @@ export type SolanaSpoke = {
       ],
       "accounts": [
         {
-          "name": "relayer",
+          "name": "relayerAccount",
           "writable": true,
-          "signer": true
+          "signer": true,
+          "relations": [
+            "baseConfig"
+          ]
         },
         {
           "name": "baseConfig",
@@ -2006,7 +2285,7 @@ export type SolanaSpoke = {
         },
         {
           "name": "wormholeProgram",
-          "address": "3u8hJUVTA4jH1wYAyUur7FFZVQ8H635K3tSHHF4ssjQ5"
+          "address": "worm2ZoG2kUd4vFXhvjh93UUH596ayRfgQ2MgjNMTth"
         },
         {
           "name": "rent",
@@ -2140,11 +2419,17 @@ export type SolanaSpoke = {
             },
             {
               "name": "relayerVault",
-              "writable": true
+              "writable": true,
+              "relations": [
+                "baseConfig"
+              ]
             },
             {
               "name": "relayerRewardAccount",
-              "writable": true
+              "writable": true,
+              "relations": [
+                "baseConfig"
+              ]
             },
             {
               "name": "mint",
@@ -2426,11 +2711,15 @@ export type SolanaSpoke = {
             },
             {
               "name": "wormholeProgram",
-              "address": "3u8hJUVTA4jH1wYAyUur7FFZVQ8H635K3tSHHF4ssjQ5"
+              "address": "worm2ZoG2kUd4vFXhvjh93UUH596ayRfgQ2MgjNMTth"
             },
             {
               "name": "systemProgram",
               "address": "11111111111111111111111111111111"
+            },
+            {
+              "name": "tokenProgram",
+              "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
             },
             {
               "name": "associatedTokenProgram",
@@ -2541,6 +2830,14 @@ export type SolanaSpoke = {
         {
           "name": "tokenProgram",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associatedTokenProgram",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
@@ -2616,7 +2913,10 @@ export type SolanaSpoke = {
       "accounts": [
         {
           "name": "owner",
-          "signer": true
+          "signer": true,
+          "relations": [
+            "baseConfig"
+          ]
         },
         {
           "name": "baseConfig",
@@ -2660,7 +2960,10 @@ export type SolanaSpoke = {
       "accounts": [
         {
           "name": "owner",
-          "signer": true
+          "signer": true,
+          "relations": [
+            "baseConfig"
+          ]
         },
         {
           "name": "baseConfig",
@@ -2699,74 +3002,6 @@ export type SolanaSpoke = {
       ]
     },
     {
-      "name": "updateCustomWormholeEmitter",
-      "discriminator": [
-        99,
-        230,
-        123,
-        71,
-        62,
-        241,
-        48,
-        237
-      ],
-      "accounts": [
-        {
-          "name": "owner",
-          "signer": true
-        },
-        {
-          "name": "baseConfig",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  98,
-                  97,
-                  115,
-                  101,
-                  95,
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "customWormholeEmitter",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  101,
-                  109,
-                  105,
-                  116,
-                  116,
-                  101,
-                  114
-                ]
-              }
-            ]
-          }
-        }
-      ],
-      "args": [
-        {
-          "name": "finality",
-          "type": "u8"
-        }
-      ]
-    },
-    {
       "name": "updateDeliveryPrice",
       "discriminator": [
         92,
@@ -2781,7 +3016,10 @@ export type SolanaSpoke = {
       "accounts": [
         {
           "name": "priceKeeper",
-          "signer": true
+          "signer": true,
+          "relations": [
+            "baseConfig"
+          ]
         },
         {
           "name": "baseConfig",
@@ -2875,7 +3113,10 @@ export type SolanaSpoke = {
       "accounts": [
         {
           "name": "owner",
-          "signer": true
+          "signer": true,
+          "relations": [
+            "baseConfig"
+          ]
         },
         {
           "name": "baseConfig",
@@ -3038,11 +3279,17 @@ export type SolanaSpoke = {
             },
             {
               "name": "relayerVault",
-              "writable": true
+              "writable": true,
+              "relations": [
+                "baseConfig"
+              ]
             },
             {
               "name": "relayerRewardAccount",
-              "writable": true
+              "writable": true,
+              "relations": [
+                "baseConfig"
+              ]
             },
             {
               "name": "mint",
@@ -3324,11 +3571,15 @@ export type SolanaSpoke = {
             },
             {
               "name": "wormholeProgram",
-              "address": "3u8hJUVTA4jH1wYAyUur7FFZVQ8H635K3tSHHF4ssjQ5"
+              "address": "worm2ZoG2kUd4vFXhvjh93UUH596ayRfgQ2MgjNMTth"
             },
             {
               "name": "systemProgram",
               "address": "11111111111111111111111111111111"
+            },
+            {
+              "name": "tokenProgram",
+              "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
             },
             {
               "name": "associatedTokenProgram",
@@ -3381,19 +3632,6 @@ export type SolanaSpoke = {
       ]
     },
     {
-      "name": "customWormholeEmitter",
-      "discriminator": [
-        193,
-        34,
-        146,
-        181,
-        26,
-        60,
-        76,
-        7
-      ]
-    },
-    {
       "name": "deliveryPriceConfig",
       "discriminator": [
         246,
@@ -3443,6 +3681,60 @@ export type SolanaSpoke = {
         102,
         119,
         77
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "inboundTransferEvent",
+      "discriminator": [
+        159,
+        22,
+        11,
+        137,
+        245,
+        76,
+        49,
+        204
+      ]
+    },
+    {
+      "name": "outboundTransferEvent",
+      "discriminator": [
+        225,
+        253,
+        33,
+        134,
+        245,
+        43,
+        48,
+        116
+      ]
+    },
+    {
+      "name": "pairingAccountEvent",
+      "discriminator": [
+        119,
+        178,
+        238,
+        32,
+        189,
+        237,
+        43,
+        158
+      ]
+    },
+    {
+      "name": "releaseFundsEvent",
+      "discriminator": [
+        156,
+        241,
+        58,
+        41,
+        202,
+        170,
+        124,
+        59
       ]
     }
   ],
@@ -3701,6 +3993,21 @@ export type SolanaSpoke = {
       "code": 6050,
       "name": "zeroUserAccount",
       "msg": "User account can not be 0x0"
+    },
+    {
+      "code": 6051,
+      "name": "pdaAccountAlreadyInitialized",
+      "msg": "PDA account already initialized"
+    },
+    {
+      "code": 6052,
+      "name": "invalidEvmTargetSelector",
+      "msg": "Invalid Evm target selector"
+    },
+    {
+      "code": 6053,
+      "name": "invalidFinality",
+      "msg": "Invalid finality"
     }
   ],
   "types": [
@@ -3800,6 +4107,10 @@ export type SolanaSpoke = {
               "Account EOA that can update delivery prices"
             ],
             "type": "pubkey"
+          },
+          {
+            "name": "finality",
+            "type": "u8"
           }
         ]
       }
@@ -3867,6 +4178,10 @@ export type SolanaSpoke = {
           {
             "name": "priceKeeper",
             "type": "pubkey"
+          },
+          {
+            "name": "finality",
+            "type": "u8"
           }
         ]
       }
@@ -3926,6 +4241,12 @@ export type SolanaSpoke = {
             "name": "priceKeeper",
             "type": {
               "option": "pubkey"
+            }
+          },
+          {
+            "name": "finality",
+            "type": {
+              "option": "u8"
             }
           }
         ]
@@ -3989,27 +4310,6 @@ export type SolanaSpoke = {
       }
     },
     {
-      "name": "customWormholeEmitter",
-      "docs": [
-        "This is the pda account that we need for Wormhole Core Bridge",
-        "It wil be used as emitter account during sending messages with raw core bridge (without token_bridge)",
-        "It does not need to have any data"
-      ],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "finality",
-            "type": {
-              "defined": {
-                "name": "finality"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
       "name": "deliveryPriceConfig",
       "docs": [
         "Delivery Price Config",
@@ -4053,15 +4353,106 @@ export type SolanaSpoke = {
       }
     },
     {
-      "name": "finality",
+      "name": "inboundTransferEvent",
       "type": {
-        "kind": "enum",
-        "variants": [
+        "kind": "struct",
+        "fields": [
           {
-            "name": "confirmed"
+            "name": "actionType",
+            "type": "u8"
           },
           {
-            "name": "finalized"
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "nonce",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "outboundTransferEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "actionType",
+            "type": "u8"
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "nonce",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "pairingAccountEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "newAccount",
+            "type": "pubkey"
+          },
+          {
+            "name": "userId",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "nonce",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "releaseFundsEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "nonce",
+            "type": "u64"
           }
         ]
       }
@@ -4094,7 +4485,8 @@ export type SolanaSpoke = {
     {
       "name": "vaultConfig",
       "docs": [
-        "Vault config pda account is used as owner for ATA accounts of tokens deposited to into Spoke"
+        "Vault config pda account is used as owner for ATA accounts of tokens deposited to into Spoke.",
+        "This account is also vault for SOL so it must be initialized."
       ],
       "type": {
         "kind": "struct",

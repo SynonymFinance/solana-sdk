@@ -1,5 +1,6 @@
 import { BN, Program } from "@coral-xyz/anchor";
-import { SolanaSpoke } from "../../ts-types/solana/solana_spoke";
+import { SolanaSpoke as SolanaSpokeDevnet } from "../../ts-types/solana/solana_spoke_devnet";
+import { SolanaSpoke as SolanaSpokeMainnet } from "../../ts-types/solana/solana_spoke_mainnet";
 import { PublicKey, TransactionInstruction } from "@solana/web3.js";
 import { utils as coreUtils } from '@wormhole-foundation/sdk-solana-core';
 import { getAssociatedTokenAddressSync, NATIVE_MINT } from "@solana/spl-token";
@@ -12,18 +13,21 @@ import { ParsedVaa } from "../commons";
 import { HubActionType } from "../commons/utils";
 
 export class InstructionBuilder {
-  private spokeProgram: Program<SolanaSpoke>;
+  private spokeProgramDevnet: Program<SolanaSpokeDevnet>;
+  private spokeProgramMainnet: Program<SolanaSpokeMainnet>;
   private relayerVault: PublicKey;
   private relayerRewardAccount: PublicKey;
   private coreBridgePid: PublicKey;
 
   constructor(
-    spokeProgram: Program<SolanaSpoke>,
+    spokeProgramDevnet: Program<SolanaSpokeDevnet>,
+    spokeProgramMainnet: Program<SolanaSpokeMainnet>,
     relayerVault: PublicKey,
     relayerRewardAccount: PublicKey,
     coreBridgePid: PublicKey
   ) {
-    this.spokeProgram = spokeProgram;
+    this.spokeProgramDevnet = spokeProgramDevnet;
+    this.spokeProgramMainnet = spokeProgramMainnet;
     this.relayerVault = relayerVault;
     this.relayerRewardAccount = relayerRewardAccount;
     this.coreBridgePid = coreBridgePid;
@@ -42,17 +46,18 @@ export class InstructionBuilder {
     const recipient = new PublicKey(releaseFundsPayload.user);
     const mint = new PublicKey(releaseFundsPayload.token);
     const userMessageNonce = BigInt(ethers.hexlify(releaseFundsPayload.nonce));
-    const consumedNoncePda = deriveConsumedNoncePda(this.spokeProgram.programId, userMessageNonce, recipient);
+    const consumedNoncePda = deriveConsumedNoncePda(this.getSpokeProgramId(), userMessageNonce, recipient);
 
     // make sure target address is spoke
-    if (Buffer.from(deliveryInstruction.targetAddress).toString("hex") != this.spokeProgram.programId.toBuffer().toString("hex")) {
+    if (Buffer.from(deliveryInstruction.targetAddress).toString("hex") != this.getSpokeProgramId().toBuffer().toString("hex")) {
       throw Error("DeliveryInstruction target address must be spokeProgram Id")
     }
 
-    const ix = this.spokeProgram.methods
+    const ix = this.getSpokeProgramMethods()
       .releaseFunds(Array.from(deliveryInstructionVaa.hash))
       .accounts({
-        relayer: relayerAddress,
+        // @ts-ignore: this account must be passed
+        relayerAccount: relayerAddress,
         mint,
         recipient,
         // @ts-ignore: this Pda must be passed as it has complicated seed and Anchor TS client can't derive it 
@@ -72,12 +77,12 @@ export class InstructionBuilder {
     userMessageNonce: bigint
   ): Promise<TransactionInstruction> {
     const wormholeMessagePda = deriveWormholeCoreMessageKey(
-      this.spokeProgram.programId,
+      this.getSpokeProgramId(),
       userMessageNonce,
       senderAddress
     );
     const wormholeAccounts = coreUtils.getPostMessageCpiAccounts(
-      this.spokeProgram.programId,
+      this.getSpokeProgramId(),
       this.coreBridgePid,
       senderAddress, // payer
       wormholeMessagePda
@@ -85,15 +90,16 @@ export class InstructionBuilder {
 
     let method;
     if (actionType == HubActionType.WithdrawNative) {
-      method = this.spokeProgram.methods.withdraw(amount);
+      method = this.getSpokeProgramMethods().withdraw(amount);
     } else {
-      method = this.spokeProgram.methods.borrow(amount);
+      method = this.getSpokeProgramMethods().borrow(amount);
     }
 
     const ix = await method
       .accounts({
         generic: {
           sender: senderAddress,
+          // @ts-ignore: this account must be passed
           relayerVault: this.relayerVault,
           relayerRewardAccount: this.relayerRewardAccount,
           mint,
@@ -113,12 +119,12 @@ export class InstructionBuilder {
     userMessageNonce: bigint
   ): Promise<TransactionInstruction> {
     const wormholeMessagePda = deriveWormholeCoreMessageKey(
-      this.spokeProgram.programId,
+      this.getSpokeProgramId(),
       userMessageNonce,
       senderAddress
     );
     const wormholeAccounts = coreUtils.getPostMessageCpiAccounts(
-      this.spokeProgram.programId,
+      this.getSpokeProgramId(),
       this.coreBridgePid,
       senderAddress, // payer
       wormholeMessagePda
@@ -130,9 +136,9 @@ export class InstructionBuilder {
 
     let method;
     if (actionType == HubActionType.Deposit) {
-      method = this.spokeProgram.methods.deposit(amount)
+      method = this.getSpokeProgramMethods().deposit(amount)
     } else {
-      method = this.spokeProgram.methods.repay(amount)
+      method = this.getSpokeProgramMethods().repay(amount)
     }
 
     const ix = method
@@ -140,6 +146,7 @@ export class InstructionBuilder {
         generic: {
           sender: senderAddress,
           mint,
+          // @ts-ignore: this account must be passed
           relayerVault: this.relayerVault,
           relayerRewardAccount: this.relayerRewardAccount,
           ...wormholeAccounts
@@ -158,23 +165,24 @@ export class InstructionBuilder {
     userMessageNonce: bigint
   ): Promise<TransactionInstruction> {
     const wormholeMessagePda = deriveWormholeCoreMessageKey(
-      this.spokeProgram.programId,
+      this.getSpokeProgramId(),
       userMessageNonce,
       senderAddress
     );
     const wormholeAccounts = coreUtils.getPostMessageCpiAccounts(
-      this.spokeProgram.programId,
+      this.getSpokeProgramId(),
       this.coreBridgePid,
       senderAddress, // payer
       wormholeMessagePda
     );
 
 
-    const ix = this.spokeProgram
-      .methods.pairAccount(Array.from(userId))
+    const ix = this.getSpokeProgramMethods()
+      .pairAccount(Array.from(userId))
       .accounts({
         generic: {
           sender: senderAddress,
+          // @ts-ignore: this account must be passed
           relayerVault: this.relayerVault,
           relayerRewardAccount: this.relayerRewardAccount,
           // This account is ignored for account pairing (mint) but must be passed
@@ -185,6 +193,28 @@ export class InstructionBuilder {
       .instruction()
 
     return ix;
+  }
+
+  getSpokeProgramId(): PublicKey {
+    const network = process.env.SOLANA_NETWORK;
+    if(network === "MAINNET") {
+      return this.spokeProgramMainnet.programId;
+    } else if (network === "DEVNET") {
+      return this.spokeProgramDevnet.programId;
+    } else {
+      throw new Error("Unknown network environment for IDL loading: " + network);
+    }
+  }
+
+  getSpokeProgramMethods() {
+    const network = process.env.SOLANA_NETWORK;
+    if(network === "MAINNET") {
+      return this.spokeProgramMainnet.methods;
+    } else if (network === "DEVNET") {
+      return this.spokeProgramDevnet.methods;
+    } else {
+      throw new Error("Unknown network environment for IDL loading: " + network);
+    }
   }
 
 }

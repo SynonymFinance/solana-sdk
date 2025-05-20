@@ -6,7 +6,7 @@ import * as anchor from "@coral-xyz/anchor";
 import { BN } from "@coral-xyz/anchor";
 import { PublicKey, LAMPORTS_PER_SOL, Connection, Keypair, SystemProgram, Transaction, sendAndConfirmTransaction, SYSVAR_CLOCK_PUBKEY, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
 import { getAccount, getOrCreateAssociatedTokenAccount, TOKEN_PROGRAM_ID, transferChecked } from "@solana/spl-token";
-import { SolanaSpoke } from "../../../ts-types/solana/solana_spoke";
+
 import { utils as coreUtils } from '@wormhole-foundation/sdk-solana-core';
 
 export const WRAPPED_WETH_DECIMALS = 8;
@@ -69,26 +69,6 @@ export async function airdrop(connection: Connection, userPubkey: PublicKey) {
         lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
         signature: signature,
     });
-}
-
-export async function pauseSpoke(program: anchor.Program<SolanaSpoke>, ownerKeypair: Keypair) {
-  await program.methods
-    .pauseSpoke()
-    .accounts({
-      owner: ownerKeypair.publicKey
-    })
-    .signers([ownerKeypair])
-    .rpc({ skipPreflight: true });
-}
-
-export async function unpauseSpoke(program: anchor.Program<SolanaSpoke>, ownerKeypair: Keypair) {
-  await program.methods
-    .unpauseSpoke()
-    .accounts({
-      owner: ownerKeypair.publicKey
-    })
-    .signers([ownerKeypair])
-    .rpc({ skipPreflight: true });
 }
 
 export async function getTokenBridgeSequenceValue(
