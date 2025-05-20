@@ -1,4 +1,16 @@
-export * from "./solana_spoke";
+import dotenv from "dotenv";
+dotenv.config();
 
-import solanaSpokeIdl from './idl/solana_spoke.json';
+
+const network = process.env.SOLANA_NETWORK;
+let solanaSpokeIdl: any;
+
+if (network === 'MAINNET') {
+  solanaSpokeIdl = require('./idl-mainnet/solana_spoke.json');
+} else if (network === 'DEVNET') {
+  solanaSpokeIdl = require('./idl-devnet/solana_spoke.json');
+} else {
+  throw new Error("Unknown network environment for IDL loading: " + network);
+}
+
 export { solanaSpokeIdl };
