@@ -50,34 +50,44 @@ If specific commit hash is required:
 2. You must have the necessary permissions to publish the package.
 3. You must have the latest version of the package.
 
-## **Step 1: Update the Version**
+## Step 1: Update the Version
 1. Open the `package.json` file.
 2. Update the `"version"` field according to [Semantic Versioning](https://semver.org/):
    - `MAJOR.MINOR.PATCH` (e.g., change from `1.0.0` to `1.1.0` or `1.0.1`).
 
 
-## **Step 2: Build the Package**
+## Step 2: Login to npm repository
+
+```
+yarn login --scope synofinance 
+```
+
+You will be asked to provide username and email used during registration.
+
+Later when running yarn publish --access public you will be asked for password.
+
+## Step 3: Build the Package
 Run the following command to build the package:
 
 ```
 yarn run build
 ```
 
-## **Step 3: Create a Package Archive File**
+## Step 4: Create a Package Archive File
 Generate the .tgz package file by running the following command:
 
 ```
 yarn pack
 ```
 
-## **Step 4: Publish the Package**
+## Step 5: Publish the Package
 Release the package to the public registry:
 
 ```
 yarn publish --access public
 ```
 
-## **Step 5: Verify the Release**
+## Step 6: Verify the Release
 
 1.Go to the package's NPM page to confirm the version update.
 2.Verify that the package is available and that everything was published successfully.

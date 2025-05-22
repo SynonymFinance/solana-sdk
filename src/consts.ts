@@ -3,6 +3,8 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
+export const SOLANA_DEFAULT_COMMITMENT_LEVEL = "confirmed";
+
 export const SOLANA_RPC = process.env.SOLANA_NETWORK == "MAINNET" ? process.env.SOLANA_RPC_MAINNET! : process.env.SOLANA_RPC_DEVNET!;
 export const SOLANA_RELAYER_EOA = process.env.SOLANA_NETWORK == "MAINNET" ? [process.env.SOLANA_PRIVATE_KEY_MAINNET!] : [process.env.SOLANA_PRIVATE_KEY_DEVNET!];
 
