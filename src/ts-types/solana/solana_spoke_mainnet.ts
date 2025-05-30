@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/solana_spoke.json`.
  */
 export type SolanaSpoke = {
-  "address": "syno2CN6vquP39U9UfewmSPm6QKaR1rvrEViLoU2FY8",
+  "address": "syno77ES55GhGHdaGT5Qaf45EkrAFNhp7spwB2HsEsy",
   "metadata": {
     "name": "solanaSpoke",
     "version": "0.1.0",
